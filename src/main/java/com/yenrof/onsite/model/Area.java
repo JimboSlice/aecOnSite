@@ -1,7 +1,12 @@
 package com.yenrof.onsite.model;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
+
+import org.codehaus.jackson.annotate.JsonBackReference;
+import org.codehaus.jackson.annotate.JsonManagedReference;
+
 import java.util.Date;
 import java.util.List;
 
@@ -32,15 +37,18 @@ public class Area implements Serializable {
 
 	//bi-directional many-to-one association to Report
 	@ManyToOne
+	@JsonBackReference
 	@JoinColumn(name="Report_reportId")
 	private Report report;
 
 	//bi-directional many-to-one association to Asset
 	@OneToMany(mappedBy="area")
+	@JsonManagedReference
 	private List<Asset> assets;
 
 	//bi-directional many-to-one association to Note
 	@OneToMany(mappedBy="area")
+	@JsonManagedReference
 	private List<Note> notes;
 
 	public Area() {

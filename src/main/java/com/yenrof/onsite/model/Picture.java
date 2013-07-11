@@ -1,7 +1,11 @@
 package com.yenrof.onsite.model;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
+
+import org.codehaus.jackson.annotate.JsonBackReference;
+
 import java.util.Date;
 
 
@@ -31,11 +35,13 @@ public class Picture implements Serializable {
 
 	//bi-directional many-to-one association to Asset
 	@ManyToOne
+	@JsonBackReference
 	@JoinColumn(name="Asset_assetId")
 	private Asset asset;
 
 	//bi-directional many-to-one association to Note
 	@ManyToOne
+	@JsonBackReference
 	@JoinColumn(name="Note_noteId")
 	private Note note;
 

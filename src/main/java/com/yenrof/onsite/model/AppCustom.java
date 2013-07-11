@@ -1,7 +1,11 @@
 package com.yenrof.onsite.model;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
+
+import org.codehaus.jackson.annotate.JsonManagedReference;
+
 import java.util.Date;
 
 
@@ -37,6 +41,7 @@ public class AppCustom implements Serializable {
 
 	//bi-directional one-to-one association to UserPreference
 	@OneToOne
+	@JsonManagedReference
 	@JoinColumn(name="UserPreference_userPreferenceId")
 	private UserPreference userPreference;
 

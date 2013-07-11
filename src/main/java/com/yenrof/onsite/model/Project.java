@@ -4,6 +4,7 @@ import java.io.Serializable;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
+import org.codehaus.jackson.annotate.JsonManagedReference;
 
 
 /**
@@ -56,6 +57,7 @@ public class Project implements Serializable {
 
 	//bi-directional many-to-one association to Report
 	@OneToMany(mappedBy="project")
+	@JsonManagedReference
 	private List<Report> reports;
 
 	public Project() {
