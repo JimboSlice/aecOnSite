@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.0"
+   xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="
+        http://java.sun.com/xml/ns/persistence
+        http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+   	<persistence-unit name="myJPA" transaction-type="JTA">
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+		<jta-data-source>java:jboss/datasources/MySqlDS</jta-data-source>
+		<class>com.yenrof.onsite.model.AppCustom</class>
+		<class>com.yenrof.onsite.model.Area</class>
+		<class>com.yenrof.onsite.model.Asset</class>
+		<class>com.yenrof.onsite.model.Note</class>
+		<class>com.yenrof.onsite.model.Picture</class>
+		<class>com.yenrof.onsite.model.Project</class>
+		<class>com.yenrof.onsite.model.ReferenceData</class>
+		<class>com.yenrof.onsite.model.Report</class>
+		<class>com.yenrof.onsite.model.UserPreference</class>
+		<properties>
+			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect" />
+		 	<property name="hibernate.hbm2ddl.auto" value="none" />
+			<property name="hibernate.show_sql" value="true" />
+			<property name="hibernate.format_sql" value="true" />			
+		</properties>
+	</persistence-unit>
+</persistence>

@@ -1,0 +1,1 @@
+<groups xsi:schemaLocation="http://www.isdc.ro/wro wro.xsd"><group name="app.min"><js>/js/app.js</js></group><group name="m.screen.min"><css>/css/screen.css</css><css>/css/m.screen.css</css></group><group name="d.screen.min"><css>/css/screen.css</css><css>/css/d.screen.css</css></group></groups>
