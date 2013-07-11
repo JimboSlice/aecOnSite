@@ -1,4 +1,4 @@
-package com.yenrof.onsite.dataservice;
+package com.yenrof.onsite.dataservice; 
 
 import javax.enterprise.context.ApplicationScoped; 
 import javax.inject.Inject;
