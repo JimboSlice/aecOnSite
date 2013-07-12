@@ -55,12 +55,12 @@ public class UserPreference implements Serializable {
 
 	//bi-directional one-to-one association to AppCustom
 	@OneToOne(mappedBy="userPreference", cascade={CascadeType.ALL})
-	@JsonBackReference
+	//@JsonBackReference
 	private AppCustom appCustom;
 
 	//bi-directional one-to-one association to Report
-	@OneToOne(mappedBy="userPreference")
-	@JsonBackReference
+	//@OneToOne(mappedBy="userPreference")
+	//@JsonBackReference
 	private Report report;
 
 	public UserPreference() {

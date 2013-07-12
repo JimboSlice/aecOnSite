@@ -41,20 +41,19 @@ public class Report implements Serializable {
 
 	//bi-directional many-to-one association to Area
 	@OneToMany(mappedBy="report")
-	@JsonManagedReference
+	//@JsonManagedReference
 	private List<Area> areas;
 
 	//bi-directional many-to-one association to Project
-	@ManyToOne
 	@JsonBackReference
+	@ManyToOne
 	@JoinColumn(name="Project_projectId")
 	private Project project;
 
 	//bi-directional one-to-one association to UserPreference
-	@OneToOne
-	@JsonManagedReference
-	@JoinColumn(name="UserPreference_userPreferenceId")
-	private UserPreference userPreference;
+	//@OneToOne
+	//@JoinColumn(name="UserPreference_userPreferenceId")
+//	private UserPreference userPreference;
 
 	public Report() {
 	}
@@ -153,12 +152,12 @@ public class Report implements Serializable {
 		this.project = project;
 	}
 
-	public UserPreference getUserPreference() {
+	/*public UserPreference getUserPreference() {
 		return this.userPreference;
 	}
 
 	public void setUserPreference(UserPreference userPreference) {
 		this.userPreference = userPreference;
-	}
+	}*/
 
 }

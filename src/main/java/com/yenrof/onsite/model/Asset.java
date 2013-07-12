@@ -44,13 +44,13 @@ public class Asset implements Serializable {
 
 	//bi-directional many-to-one association to Area
 	@ManyToOne(cascade={CascadeType.ALL})
-	@JsonBackReference
+//	@JsonBackReference
 	@JoinColumn(name="Area_areaId")
 	private Area area;
 
 	//bi-directional many-to-one association to Picture
 	@OneToMany(mappedBy="asset")
-	@JsonManagedReference
+	//@JsonManagedReference
 	private List<Picture> pictures;
 
 	public Asset() {

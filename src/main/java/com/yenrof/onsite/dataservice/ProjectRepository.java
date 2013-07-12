@@ -1,6 +1,6 @@
-package com.yenrof.onsite.dataservice; 
+package com.yenrof.onsite.dataservice;
 
-import javax.enterprise.context.ApplicationScoped; 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -11,7 +11,7 @@ import javax.persistence.criteria.Root;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Logger; 
+import java.util.logging.Logger;
 
 import com.yenrof.onsite.model.*;
 
@@ -38,33 +38,39 @@ public class ProjectRepository {
 		// feature in JPA 2.0
 		// criteria.select(Project).where(cb.equal(Project.get(Patient_.name),
 		// ssn));
-		criteria.select(Project).where(cb.equal(Project.get("projectNumber"), projectNumber));
+		criteria.select(Project).where(
+				cb.equal(Project.get("projectNumber"), projectNumber));
 		return em.createQuery(criteria).getSingleResult();
 	}
 
 	public List<Project> findAllOrderedByName() {
-		Query query = em.createNamedQuery("Project.findAll");
-		@SuppressWarnings("unchecked")
-		List<Project> list = query.getResultList();
-		Iterator<Project> itr = list.iterator();
-		while (itr.hasNext()) {
-			Project project = itr.next();
-			log.info("getProjectName:" + project.getProjectName());
-		}
-		return list;
+		/*
+		 * Query query = em.createNamedQuery("Project.findAll");
+		 * 
+		 * @SuppressWarnings("unchecked") List<Project> list =
+		 * query.getResultList(); Iterator<Project> itr = list.iterator(); while
+		 * (itr.hasNext()) { Project project = itr.next();
+		 * log.info("getProjectName:" + project.getProjectName()); } return
+		 * list;
+		 */
+
+		String select = "select p from Project p "
+				+ "left join fetch p.reports";
+
+		return (List<Project>) em.createQuery(select).getResultList();
 	}
-	
-		public void persist(Project project) throws Exception {
+
+	public void persist(Project project) throws Exception {
 		log.info("Persisting " + project.getProjectName());
 		Date date = new Date();
 		project.setTimeStamp(date);
-		List<Report> reports  = project.getReports();
+	    List<Report> reports = project.getReports();
 		Iterator<Report> itr = reports.iterator();
 		while (itr.hasNext()) {
 			Report report = itr.next();
 			log.info("report:" + report.getRname());
 			report.setTimeStamp(date);
-		}
+		} 
 		em.persist(project);
 	}
 }

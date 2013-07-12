@@ -41,7 +41,7 @@ public class AppCustom implements Serializable {
 
 	//bi-directional one-to-one association to UserPreference
 	@OneToOne
-	@JsonManagedReference
+	//@JsonManagedReference
 	@JoinColumn(name="UserPreference_userPreferenceId")
 	private UserPreference userPreference;
 

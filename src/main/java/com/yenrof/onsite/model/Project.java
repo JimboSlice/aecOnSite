@@ -56,8 +56,8 @@ public class Project implements Serializable {
 	private String zipcode;
 
 	//bi-directional many-to-one association to Report
-	@OneToMany(mappedBy="project")
 	@JsonManagedReference
+	@OneToMany(cascade=CascadeType.ALL, mappedBy="project")
 	private List<Report> reports;
 
 	public Project() {

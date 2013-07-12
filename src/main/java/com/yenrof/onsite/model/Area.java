@@ -37,18 +37,18 @@ public class Area implements Serializable {
 
 	//bi-directional many-to-one association to Report
 	@ManyToOne
-	@JsonBackReference
+	//@JsonBackReference
 	@JoinColumn(name="Report_reportId")
 	private Report report;
 
 	//bi-directional many-to-one association to Asset
 	@OneToMany(mappedBy="area")
-	@JsonManagedReference
+	//@JsonManagedReference
 	private List<Asset> assets;
 
 	//bi-directional many-to-one association to Note
 	@OneToMany(mappedBy="area")
-	@JsonManagedReference
+	//@JsonManagedReference
 	private List<Note> notes;
 
 	public Area() {
