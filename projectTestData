@@ -1,0 +1,16 @@
+"project": {
+ "address":"1369 Greenridge Trail",
+ "city":"Lithonia",
+ "country":"USA",
+ "countryCode":"US",
+ "county":"Dekalb",
+ "latcoord":0.0,
+ "longcoord":0.0,
+ "neighborhood": "Greenridge",
+ "projectName":"TestProject",
+ "projectNumber":"1234567890",
+ "state":"GA",
+ "subAddress":"Apt M",
+ "uniqueRoomName":"Room One",
+ "zipcode":"30058"
+}

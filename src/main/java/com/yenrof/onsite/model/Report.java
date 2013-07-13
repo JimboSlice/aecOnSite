@@ -10,18 +10,17 @@ import org.codehaus.jackson.annotate.JsonManagedReference;
 import java.util.Date;
 import java.util.List;
 
-
 /**
  * The persistent class for the Report database table.
  * 
  */
 @Entity
-@NamedQuery(name="Report.findAll", query="SELECT r FROM Report r")
+@NamedQuery(name = "Report.findAll", query = "SELECT r FROM Report r")
 public class Report implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private String reportId;
 
 	private String constructionphase;
@@ -39,21 +38,21 @@ public class Report implements Serializable {
 
 	private byte[] weatherData;
 
-	//bi-directional many-to-one association to Area
-	@OneToMany(mappedBy="report")
-	//@JsonManagedReference
-	private List<Area> areas;
-
-	//bi-directional many-to-one association to Project
+	// bi-directional many-to-one association to Project
 	@JsonBackReference
 	@ManyToOne
-	@JoinColumn(name="Project_projectId")
+	@JoinColumn(name = "Project_projectId")
 	private Project project;
 
-	//bi-directional one-to-one association to UserPreference
-	//@OneToOne
-	//@JoinColumn(name="UserPreference_userPreferenceId")
-//	private UserPreference userPreference;
+	// bi-directional many-to-one association to Area
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "report")
+	@JsonManagedReference
+	private List<Area> areas;
+
+	// bi-directional one-to-one association to UserPreference
+	// @OneToOne
+	// @JoinColumn(name="UserPreference_userPreferenceId")
+	// private UserPreference userPreference;
 
 	public Report() {
 	}
@@ -152,12 +151,11 @@ public class Report implements Serializable {
 		this.project = project;
 	}
 
-	/*public UserPreference getUserPreference() {
-		return this.userPreference;
-	}
-
-	public void setUserPreference(UserPreference userPreference) {
-		this.userPreference = userPreference;
-	}*/
+	/*
+	 * public UserPreference getUserPreference() { return this.userPreference; }
+	 * 
+	 * public void setUserPreference(UserPreference userPreference) {
+	 * this.userPreference = userPreference; }
+	 */
 
 }

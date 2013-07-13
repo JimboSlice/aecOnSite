@@ -54,23 +54,52 @@ public class ProjectRepository {
 		 * list;
 		 */
 
-		String select = "select p from Project p "
-				+ "left join fetch p.reports";
+		/*
+		 * String select = "select p from Project p " +
+		 * "left join fetch p.reports";
+		 * 
+		 * return (List<Project>) em.createQuery(select).getResultList();
+		 */
+		String select = "select * from Project order by projectName";
 
-		return (List<Project>) em.createQuery(select).getResultList();
+		return (List<Project>) em.createNativeQuery(select).getResultList();
 	}
 
 	public void persist(Project project) throws Exception {
 		log.info("Persisting " + project.getProjectName());
 		Date date = new Date();
 		project.setTimeStamp(date);
-	    List<Report> reports = project.getReports();
-		Iterator<Report> itr = reports.iterator();
-		while (itr.hasNext()) {
-			Report report = itr.next();
-			log.info("report:" + report.getRname());
-			report.setTimeStamp(date);
-		} 
+		List<Report> reports = project.getReports();
+		if (reports != null) {
+			Iterator<Report> itr = reports.iterator();
+			while (itr.hasNext()) {
+				Report report = itr.next();
+				log.info("report:" + report.getRname());
+				report.setTimeStamp(date);
+				report.setProject(project);
+				List<Area> areas = report.getAreas();
+				if (areas != null) {
+					Iterator<Area> areasItr = areas.iterator();
+					while (areasItr.hasNext()) {
+						Area area = areasItr.next();
+						log.info("area:" + area.getNumber());
+						area.setTimeStamp(date);
+						area.setReport(report);
+						List<Asset> assets = area.getAssets();
+						if (assets != null) {
+							Iterator<Asset> assetItr = assets.iterator();
+							while (assetItr.hasNext()) {
+								Asset asset = assetItr.next();
+								log.info("asset:" + asset.getDescription());
+								asset.setTimeStamp(date);
+								asset.setArea(area);
+							}
+						}
+
+					}
+				}
+			}
+		}
 		em.persist(project);
 	}
 }

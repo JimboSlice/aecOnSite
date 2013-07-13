@@ -1,0 +1,40 @@
+{
+ "address":"7777 Greenridge Trail",
+ "city":"Lithonia",
+ "country":"USA",
+ "countryCode":"US",
+ "county":"Dekalb",
+ "latcoord":0.0,
+ "longcoord":0.0,
+ "neighborhood": "Greenridge",
+ "projectName":"TestProject",
+ "projectNumber":"1234567890",
+ "state":"GA",
+ "subAddress":"Apt M",
+ "uniqueRoomName":"Room One",
+ "zipcode":"30058",
+ "reports":[{
+                    "rtype":"M",
+                    "rname":"report1",
+   					"peopleOnSite": 23,
+   					"constructionphase": "starting",
+                    "areas":[{
+                    	"comment": "comment1",
+                        "name": "name1",
+                        "number": "number1",
+                            "assets":[{
+								"name": "name1",
+								"type": "type1",
+								"description": "description1"               
+							}]             
+                    }]
+           },
+           {
+                    "rtype":"A",
+                    "rname":"report2",
+                	"peopleOnSite": 25,
+                    "constructionphase": "final"
+           }
+           ]
+}
+
