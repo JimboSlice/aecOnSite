@@ -3,7 +3,7 @@ package com.yenrof.onsite.dataservice;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
+//import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -93,9 +93,43 @@ public class ProjectRepository {
 								log.info("asset:" + asset.getDescription());
 								asset.setTimeStamp(date);
 								asset.setArea(area);
+								List<Picture> pictures = asset.getPictures();
+								if (pictures != null) {
+									Iterator<Picture> pictureItr = pictures
+											.iterator();
+									while (pictureItr.hasNext()) {
+										Picture picture = pictureItr.next();
+										log.info("picture:"
+												+ picture.getComment());
+										picture.setTimeStamp(date);
+										picture.setAsset(asset);
+									}
+								}
 							}
 						}
+						List<Note> notes = area.getNotes();
+						if (notes != null) {
+							Iterator<Note> noteItr = notes.iterator();
+							while (noteItr.hasNext()) {
+								Note note = noteItr.next();
+								log.info("note:" + note.getNote());
+								note.setTimeStamp(date);
+								note.setArea(area);
+								List<Picture> pictures = note.getPictures();
+								if (pictures != null) {
+									Iterator<Picture> pictureItr = pictures
+											.iterator();
+									while (pictureItr.hasNext()) {
+										Picture picture = pictureItr.next();
+										log.info("picture:"
+												+ picture.getComment());
+										picture.setTimeStamp(date);
+										picture.setNote(note);
+									}
+								}
 
+							}
+						}
 					}
 				}
 			}

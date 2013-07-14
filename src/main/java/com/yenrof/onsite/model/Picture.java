@@ -35,13 +35,13 @@ public class Picture implements Serializable {
 
 	//bi-directional many-to-one association to Asset
 	@ManyToOne
-	//@JsonBackReference
+	@JsonBackReference("assetref")
 	@JoinColumn(name="Asset_assetId")
 	private Asset asset;
 
 	//bi-directional many-to-one association to Note
 	@ManyToOne
-	//@JsonBackReference
+	@JsonBackReference("noteref")
 	@JoinColumn(name="Note_noteId")
 	private Note note;
 

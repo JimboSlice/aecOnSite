@@ -43,12 +43,12 @@ public class Area implements Serializable {
 
 	//bi-directional many-to-one association to Asset
 	@OneToMany(cascade = CascadeType.ALL,mappedBy="area")
-	//@JsonManagedReference
+	@JsonManagedReference
 	private List<Asset> assets;
 
 	//bi-directional many-to-one association to Note
-	@OneToMany(mappedBy="area")
-	//@JsonManagedReference
+	@OneToMany(cascade = CascadeType.ALL,mappedBy="area")
+	@JsonManagedReference
 	private List<Note> notes;
 
 	public Area() {

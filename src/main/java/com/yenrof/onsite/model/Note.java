@@ -26,7 +26,7 @@ public class Note implements Serializable {
 
 	private String displayPic;
 
-	private byte itemResolved;
+	private boolean itemResolved;
 
 	private double latitude;
 
@@ -51,13 +51,13 @@ public class Note implements Serializable {
 
 	//bi-directional many-to-one association to Area
 	@ManyToOne
-//	@JsonBackReference
+	@JsonBackReference
 	@JoinColumn(name="Area_areaId")
 	private Area area;
 
 	//bi-directional many-to-one association to Picture
-	@OneToMany(mappedBy="note")
-//	@JsonManagedReference
+	@OneToMany(cascade = CascadeType.ALL,mappedBy="note")
+	@JsonManagedReference("noteref")
 	private List<Picture> pictures;
 
 	public Note() {
@@ -79,11 +79,11 @@ public class Note implements Serializable {
 		this.displayPic = displayPic;
 	}
 
-	public byte getItemResolved() {
+	public boolean getItemResolved() {
 		return this.itemResolved;
 	}
 
-	public void setItemResolved(byte itemResolved) {
+	public void setItemResolved(boolean itemResolved) {
 		this.itemResolved = itemResolved;
 	}
 
