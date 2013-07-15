@@ -1,9 +1,12 @@
 package com.yenrof.onsite.model;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
+
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
+
 import org.codehaus.jackson.annotate.JsonManagedReference;
 
 
@@ -18,7 +21,7 @@ public class Project implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private String projectId;
+	private long projectId;
 
 	private String address;
 
@@ -57,17 +60,17 @@ public class Project implements Serializable {
 
 	//bi-directional many-to-one association to Report
 	@JsonManagedReference
-	@OneToMany(cascade=CascadeType.ALL, mappedBy="project")
-	private List<Report> reports;
+	@OneToMany(fetch=FetchType.EAGER,cascade=CascadeType.ALL, mappedBy="project")
+	private Set<Report> reports;
 
 	public Project() {
 	}
 
-	public String getProjectId() {
+	public long getProjectId() {
 		return this.projectId;
 	}
 
-	public void setProjectId(String projectId) {
+	public void setProjectId(long projectId) {
 		this.projectId = projectId;
 	}
 
@@ -207,11 +210,11 @@ public class Project implements Serializable {
 		this.zipcode = zipcode;
 	}
 
-	public List<Report> getReports() {
+	public Set<Report> getReports() {
 		return this.reports;
 	}
 
-	public void setReports(List<Report> reports) {
+	public void setReports(Set<Report> reports) {
 		this.reports = reports;
 	}
 

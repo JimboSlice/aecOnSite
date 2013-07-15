@@ -8,7 +8,7 @@ import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonManagedReference;
 
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -22,7 +22,7 @@ public class Note implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private String noteId;
+	private long noteId;
 
 	private String displayPic;
 
@@ -56,18 +56,18 @@ public class Note implements Serializable {
 	private Area area;
 
 	//bi-directional many-to-one association to Picture
-	@OneToMany(cascade = CascadeType.ALL,mappedBy="note")
+	@OneToMany(fetch=FetchType.EAGER,cascade = CascadeType.ALL,mappedBy="note")
 	@JsonManagedReference("noteref")
-	private List<Picture> pictures;
+	private Set<Picture> pictures;
 
 	public Note() {
 	}
 
-	public String getNoteId() {
+	public long getNoteId() {
 		return this.noteId;
 	}
 
-	public void setNoteId(String noteId) {
+	public void setNoteId(long noteId) {
 		this.noteId = noteId;
 	}
 
@@ -175,11 +175,11 @@ public class Note implements Serializable {
 		this.area = area;
 	}
 
-	public List<Picture> getPictures() {
+	public Set<Picture> getPictures() {
 		return this.pictures;
 	}
 
-	public void setPictures(List<Picture> pictures) {
+	public void setPictures(Set<Picture> pictures) {
 		this.pictures = pictures;
 	}
 

@@ -20,7 +20,7 @@ public class Picture implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private String pictureId;
+	private long pictureId;
 
 	private String comment;
 
@@ -48,11 +48,11 @@ public class Picture implements Serializable {
 	public Picture() {
 	}
 
-	public String getPictureId() {
+	public long getPictureId() {
 		return this.pictureId;
 	}
 
-	public void setPictureId(String pictureId) {
+	public void setPictureId(long pictureId) {
 		this.pictureId = pictureId;
 	}
 

@@ -21,7 +21,7 @@ public class UserPreference implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private String userPreferenceId;
+	private long userPreferenceId;
 
 	private byte[] companyLogo;
 
@@ -67,11 +67,11 @@ public class UserPreference implements Serializable {
 	public UserPreference() {
 	}
 
-	public String getUserPreferenceId() {
+	public long getUserPreferenceId() {
 		return this.userPreferenceId;
 	}
 
-	public void setUserPreferenceId(String userPreferenceId) {
+	public void setUserPreferenceId(long userPreferenceId) {
 		this.userPreferenceId = userPreferenceId;
 	}
 

@@ -15,18 +15,18 @@ public class ReferenceData implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private int referenceDataId;
+	private long referenceDataId;
 
 	private String countries;
 
 	public ReferenceData() {
 	}
 
-	public int getReferenceDataId() {
+	public long getReferenceDataId() {
 		return this.referenceDataId;
 	}
 
-	public void setReferenceDataId(int referenceDataId) {
+	public void setReferenceDataId(long referenceDataId) {
 		this.referenceDataId = referenceDataId;
 	}
 

@@ -8,7 +8,7 @@ import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonManagedReference;
 
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 /**
  * The persistent class for the Report database table.
@@ -21,7 +21,7 @@ public class Report implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private String reportId;
+	private long reportId;
 
 	private String constructionphase;
 
@@ -45,9 +45,9 @@ public class Report implements Serializable {
 	private Project project;
 
 	// bi-directional many-to-one association to Area
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "report")
+	@OneToMany(fetch=FetchType.EAGER,cascade = CascadeType.ALL, mappedBy = "report")
 	@JsonManagedReference
-	private List<Area> areas;
+	private Set<Area> areas;
 
 	// bi-directional one-to-one association to UserPreference
 	// @OneToOne
@@ -57,11 +57,11 @@ public class Report implements Serializable {
 	public Report() {
 	}
 
-	public String getReportId() {
+	public long getReportId() {
 		return this.reportId;
 	}
 
-	public void setReportId(String reportId) {
+	public void setReportId(long reportId) {
 		this.reportId = reportId;
 	}
 
@@ -121,11 +121,11 @@ public class Report implements Serializable {
 		this.weatherData = weatherData;
 	}
 
-	public List<Area> getAreas() {
+	public Set<Area> getAreas() {
 		return this.areas;
 	}
 
-	public void setAreas(List<Area> areas) {
+	public void setAreas(Set<Area> areas) {
 		this.areas = areas;
 	}
 

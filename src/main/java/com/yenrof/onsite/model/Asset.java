@@ -8,7 +8,7 @@ import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonManagedReference;
 
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -22,7 +22,7 @@ public class Asset implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private String assetId;
+	private long assetId;
 
 	private byte appraisalFlag;
 
@@ -49,18 +49,18 @@ public class Asset implements Serializable {
 	private Area area;
 
 	//bi-directional many-to-one association to Picture
-	@OneToMany(cascade = CascadeType.ALL,mappedBy="asset")
+	@OneToMany(fetch=FetchType.EAGER,cascade = CascadeType.ALL,mappedBy="asset")
 	@JsonManagedReference("assetref")
-	private List<Picture> pictures;
+	private Set<Picture> pictures;
 
 	public Asset() {
 	}
 
-	public String getAssetId() {
+	public long getAssetId() {
 		return this.assetId;
 	}
 
-	public void setAssetId(String assetId) {
+	public void setAssetId(long assetId) {
 		this.assetId = assetId;
 	}
 
@@ -136,11 +136,11 @@ public class Asset implements Serializable {
 		this.area = area;
 	}
 
-	public List<Picture> getPictures() {
+	public Set<Picture> getPictures() {
 		return this.pictures;
 	}
 
-	public void setPictures(List<Picture> pictures) {
+	public void setPictures(Set<Picture> pictures) {
 		this.pictures = pictures;
 	}
 

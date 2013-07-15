@@ -8,7 +8,7 @@ import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonManagedReference;
 
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -22,7 +22,7 @@ public class Area implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private String areaId;
+	private long areaId;
 
 	private String comment;
 
@@ -42,23 +42,27 @@ public class Area implements Serializable {
 	private Report report;
 
 	//bi-directional many-to-one association to Asset
-	@OneToMany(cascade = CascadeType.ALL,mappedBy="area")
+	@OneToMany(fetch=FetchType.EAGER,cascade = CascadeType.ALL,mappedBy="area")
+//	@IndexColumn(name="assetId")
+	//@LazyCollection(LazyCollectionOption.FALSE)
 	@JsonManagedReference
-	private List<Asset> assets;
+	private Set<Asset> assets;
 
 	//bi-directional many-to-one association to Note
-	@OneToMany(cascade = CascadeType.ALL,mappedBy="area")
+	@OneToMany(fetch=FetchType.EAGER,cascade = CascadeType.ALL,mappedBy="area")
+	//@IndexColumn(name="noteId")
+	//@LazyCollection(LazyCollectionOption.FALSE)
 	@JsonManagedReference
-	private List<Note> notes;
+	private Set<Note> notes;
 
 	public Area() {
 	}
 
-	public String getAreaId() {
+	public long getAreaId() {
 		return this.areaId;
 	}
 
-	public void setAreaId(String areaId) {
+	public void setAreaId(long areaId) {
 		this.areaId = areaId;
 	}
 
@@ -110,11 +114,11 @@ public class Area implements Serializable {
 		this.report = report;
 	}
 
-	public List<Asset> getAssets() {
+	public Set<Asset> getAssets() {
 		return this.assets;
 	}
 
-	public void setAssets(List<Asset> assets) {
+	public void setAssets(Set<Asset> assets) {
 		this.assets = assets;
 	}
 
@@ -132,11 +136,11 @@ public class Area implements Serializable {
 		return asset;
 	}
 
-	public List<Note> getNotes() {
+	public Set<Note> getNotes() {
 		return this.notes;
 	}
 
-	public void setNotes(List<Note> notes) {
+	public void setNotes(Set<Note> notes) {
 		this.notes = notes;
 	}
 
