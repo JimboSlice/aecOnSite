@@ -5,10 +5,10 @@ import java.io.Serializable;
 import javax.persistence.*;
 
 import org.codehaus.jackson.annotate.JsonBackReference;
-import org.codehaus.jackson.annotate.JsonManagedReference;
+//import org.codehaus.jackson.annotate.JsonManagedReference;
 
 import java.util.Date;
-import java.util.Set;
+//import java.util.Set;
 
 
 /**
@@ -47,18 +47,11 @@ public class Note implements Serializable {
 
 	private byte trackableActionItem;
 
-	private byte[] voiceData;
-
 	//bi-directional many-to-one association to Area
 	@ManyToOne
 	@JsonBackReference
 	@JoinColumn(name="Area_areaId")
 	private Area area;
-
-	//bi-directional many-to-one association to Picture
-	@OneToMany(fetch=FetchType.EAGER,cascade = CascadeType.ALL,mappedBy="note")
-	@JsonManagedReference("noteref")
-	private Set<Picture> pictures;
 
 	public Note() {
 	}
@@ -159,13 +152,7 @@ public class Note implements Serializable {
 		this.trackableActionItem = trackableActionItem;
 	}
 
-	public byte[] getVoiceData() {
-		return this.voiceData;
-	}
-
-	public void setVoiceData(byte[] voiceData) {
-		this.voiceData = voiceData;
-	}
+	
 
 	public Area getArea() {
 		return this.area;
@@ -175,26 +162,6 @@ public class Note implements Serializable {
 		this.area = area;
 	}
 
-	public Set<Picture> getPictures() {
-		return this.pictures;
-	}
-
-	public void setPictures(Set<Picture> pictures) {
-		this.pictures = pictures;
-	}
-
-	public Picture addPicture(Picture picture) {
-		getPictures().add(picture);
-		picture.setNote(this);
-
-		return picture;
-	}
-
-	public Picture removePicture(Picture picture) {
-		getPictures().remove(picture);
-		picture.setNote(null);
-
-		return picture;
-	}
+	
 
 }

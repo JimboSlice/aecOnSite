@@ -33,8 +33,6 @@ public class Area implements Serializable {
 	@Temporal(TemporalType.DATE)
 	private Date timeStamp;
 
-	private byte[] voiceData;
-
 	//bi-directional many-to-one association to Report
 	@ManyToOne
 	@JsonBackReference
@@ -98,14 +96,7 @@ public class Area implements Serializable {
 		this.timeStamp = timeStamp;
 	}
 
-	public byte[] getVoiceData() {
-		return this.voiceData;
-	}
-
-	public void setVoiceData(byte[] voiceData) {
-		this.voiceData = voiceData;
-	}
-
+	
 	public Report getReport() {
 		return this.report;
 	}

@@ -36,11 +36,11 @@ public class ProjectRegistration {
     private EntityManager em;
 
     @Inject
-    private Event<Project> patientEventSrc;
+    private Event<Project> projectEventSrc;
 
     public void register(Project project) throws Exception {
         log.info("Registering " + project.getProjectName());
         em.persist(project);
-        patientEventSrc.fire(project);   
+        projectEventSrc.fire(project);   
     }
 }

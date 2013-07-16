@@ -4,7 +4,9 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
+import java.sql.Timestamp;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.codehaus.jackson.annotate.JsonManagedReference;
@@ -49,21 +51,47 @@ public class Project implements Serializable {
 
 	private String subAddress;
 
-	@Temporal(TemporalType.DATE)
-	private Date timeStamp;
+	private Timestamp timeStamp;
 
 	private String uniqueRoomName;
 
-	private byte[] voiceData;
-
 	private String zipcode;
+	
 
 	//bi-directional many-to-one association to Report
-	@JsonManagedReference
+	@JsonManagedReference("reportref")
 	@OneToMany(fetch=FetchType.EAGER,cascade=CascadeType.ALL, mappedBy="project")
 	private Set<Report> reports;
+	
+	  //bi-directional many-to-many association to inspectors with association table
+	//@JsonManagedReference("inspectorref")
+    @ManyToMany(fetch=FetchType.EAGER,cascade=CascadeType.ALL)
+    @JoinTable(
+        name="Inspector_HAS_Project"
+        , joinColumns={
+            @JoinColumn(name="projectId")
+            }
+        , inverseJoinColumns={
+            @JoinColumn(name="inspectorId")
+            }
+        )
+	private Set<Inspector> inspectors = new HashSet<Inspector>(0);
 
+    
+	public Set<Inspector> getInspectors() {
+		return inspectors;
+	}
+    
 	public Project() {
+	}
+	
+
+	public void setInspectors(Set<Inspector> inspectors) {
+		this.inspectors = inspectors;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
 	}
 
 	public long getProjectId() {
@@ -182,7 +210,7 @@ public class Project implements Serializable {
 		return this.timeStamp;
 	}
 
-	public void setTimeStamp(Date timeStamp) {
+	public void setTimeStamp(Timestamp timeStamp) {
 		this.timeStamp = timeStamp;
 	}
 
@@ -194,13 +222,7 @@ public class Project implements Serializable {
 		this.uniqueRoomName = uniqueRoomName;
 	}
 
-	public byte[] getVoiceData() {
-		return this.voiceData;
-	}
-
-	public void setVoiceData(byte[] voiceData) {
-		this.voiceData = voiceData;
-	}
+	
 
 	public String getZipcode() {
 		return this.zipcode;

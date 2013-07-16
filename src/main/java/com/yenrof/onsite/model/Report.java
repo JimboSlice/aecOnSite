@@ -7,6 +7,7 @@ import javax.persistence.*;
 import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonManagedReference;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Set;
 
@@ -31,28 +32,20 @@ public class Report implements Serializable {
 
 	private String rtype;
 
-	@Temporal(TemporalType.DATE)
-	private Date timeStamp;
+	//@Temporal(TemporalType.TIMESTAMP
+	private Timestamp timeStamp;
 
-	private byte[] voiceData;
-
-	private byte[] weatherData;
 
 	// bi-directional many-to-one association to Project
-	@JsonBackReference
-	@ManyToOne
-	@JoinColumn(name = "Project_projectId")
+	@JsonBackReference("reportref")
+	@ManyToOne(fetch=FetchType.EAGER,cascade=CascadeType.ALL)
+	@JoinColumn(name="Project_projectId")
 	private Project project;
 
 	// bi-directional many-to-one association to Area
-	@OneToMany(fetch=FetchType.EAGER,cascade = CascadeType.ALL, mappedBy = "report")
 	@JsonManagedReference
+	@OneToMany(fetch=FetchType.EAGER,cascade = CascadeType.ALL, mappedBy = "report")
 	private Set<Area> areas;
-
-	// bi-directional one-to-one association to UserPreference
-	// @OneToOne
-	// @JoinColumn(name="UserPreference_userPreferenceId")
-	// private UserPreference userPreference;
 
 	public Report() {
 	}
@@ -101,26 +94,11 @@ public class Report implements Serializable {
 		return this.timeStamp;
 	}
 
-	public void setTimeStamp(Date timeStamp) {
+	public void setTimeStamp(Timestamp timeStamp) {
 		this.timeStamp = timeStamp;
 	}
 
-	public byte[] getVoiceData() {
-		return this.voiceData;
-	}
-
-	public void setVoiceData(byte[] voiceData) {
-		this.voiceData = voiceData;
-	}
-
-	public byte[] getWeatherData() {
-		return this.weatherData;
-	}
-
-	public void setWeatherData(byte[] weatherData) {
-		this.weatherData = weatherData;
-	}
-
+	
 	public Set<Area> getAreas() {
 		return this.areas;
 	}
@@ -150,12 +128,5 @@ public class Report implements Serializable {
 	public void setProject(Project project) {
 		this.project = project;
 	}
-
-	/*
-	 * public UserPreference getUserPreference() { return this.userPreference; }
-	 * 
-	 * public void setUserPreference(UserPreference userPreference) {
-	 * this.userPreference = userPreference; }
-	 */
 
 }

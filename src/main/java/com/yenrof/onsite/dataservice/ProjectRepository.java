@@ -8,7 +8,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import java.util.Date;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -68,15 +68,20 @@ public class ProjectRepository {
 
 	public void persist(Project project) throws Exception {
 		log.info("Persisting " + project.getProjectName());
-		Date date = new Date();
-		project.setTimeStamp(date);
+		Set<Inspector> inspectors = project.getInspectors();
+		if (inspectors != null) {
+			Iterator<Inspector> itr = inspectors.iterator();
+			while (itr.hasNext()) {
+				Inspector inspector = itr.next();
+				log.info("inspector:" + inspector.getUsername());
+			}
+		}
 		Set<Report> reports = project.getReports();
 		if (reports != null) {
 			Iterator<Report> itr = reports.iterator();
 			while (itr.hasNext()) {
 				Report report = itr.next();
 				log.info("report:" + report.getRname());
-				report.setTimeStamp(date);
 				report.setProject(project);
 				Set<Area> areas = report.getAreas();
 				if (areas != null) {
@@ -84,7 +89,6 @@ public class ProjectRepository {
 					while (areasItr.hasNext()) {
 						Area area = areasItr.next();
 						log.info("area:" + area.getNumber());
-						area.setTimeStamp(date);
 						area.setReport(report);
 						Set<Asset> assets = area.getAssets();
 						if (assets != null) {
@@ -92,20 +96,7 @@ public class ProjectRepository {
 							while (assetItr.hasNext()) {
 								Asset asset = assetItr.next();
 								log.info("asset:" + asset.getDescription());
-								asset.setTimeStamp(date);
 								asset.setArea(area);
-								Set<Picture> pictures = asset.getPictures();
-								if (pictures != null) {
-									Iterator<Picture> pictureItr = pictures
-											.iterator();
-									while (pictureItr.hasNext()) {
-										Picture picture = pictureItr.next();
-										log.info("picture:"
-												+ picture.getComment());
-										picture.setTimeStamp(date);
-										picture.setAsset(asset);
-									}
-								}
 							}
 						}
 						Set<Note> notes = area.getNotes();
@@ -114,20 +105,7 @@ public class ProjectRepository {
 							while (noteItr.hasNext()) {
 								Note note = noteItr.next();
 								log.info("note:" + note.getNote());
-								note.setTimeStamp(date);
 								note.setArea(area);
-								Set<Picture> pictures = note.getPictures();
-								if (pictures != null) {
-									Iterator<Picture> pictureItr = pictures
-											.iterator();
-									while (pictureItr.hasNext()) {
-										Picture picture = pictureItr.next();
-										log.info("picture:"
-												+ picture.getComment());
-										picture.setTimeStamp(date);
-										picture.setNote(note);
-									}
-								}
 
 							}
 						}

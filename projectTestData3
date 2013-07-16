@@ -13,6 +13,11 @@
  "subAddress":"Apt M",
  "uniqueRoomName":"Room One",
  "zipcode":"30058",
+ "inspector":[{
+     "username": "username",
+     "email": "email",
+     "subscriptionType": "subscriptionType",
+     "password": "password"}],
  "reports":[{
                     "rtype":"M",
                     "rname":"report1",
