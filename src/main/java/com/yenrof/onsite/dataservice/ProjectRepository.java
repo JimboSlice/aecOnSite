@@ -66,7 +66,20 @@ public class ProjectRepository {
 		return (List<Project>) em.createNativeQuery(select).getResultList();
 	}
 
-	public void persist(Project project) throws Exception {
+	//public void persist(Project project) throws Exception {
+    public void persist(Company company) throws Exception {
+		log.info("Persisting " + company.getName());
+		Project project=null;
+		Set<Project> projects = company.getProjects();
+		if (projects != null) {
+			Iterator<Project> projectItr = projects.iterator();
+			while (projectItr.hasNext()) {
+			    project = projectItr.next();
+				log.info("note:" + project.getProjectName());
+				project.setCompany(company);
+				//persist(project);
+			}
+		}
 		log.info("Persisting " + project.getProjectName());
 		Set<Inspector> inspectors = project.getInspectors();
 		if (inspectors != null) {
@@ -113,6 +126,26 @@ public class ProjectRepository {
 				}
 			}
 		}
-		em.persist(project);
+		em.persist(company);
+	}
+	
+	/*public void persist(Company company) throws Exception {
+		log.info("Persisting " + company.getName());
+		Set<Project> projects = company.getProjects();
+		if (projects != null) {
+			Iterator<Project> projectItr = projects.iterator();
+			while (projectItr.hasNext()) {
+				Project project = projectItr.next();
+				log.info("note:" + project.getProjectName());
+				project.setCompany(company);
+				persist(project);
+
+			}
+		}
+	}*/
+	
+	public void persist(Inspector inspector) throws Exception {
+		log.info("Persisting " + inspector.getUsername());
+		em.persist(inspector);
 	}
 }

@@ -1,4 +1,11 @@
-{
+{   "address":"7777 Greenridge Trail",
+  	"name":"My Company2",
+    "city":"Lithonia",
+    "state":"NC",
+    "zipcode":"30058",
+    "email":"jforn99@gmail.com",
+    "phone":"6664448888",
+ "projects":[{
  "address":"7777 Greenridge Trail",
  "city":"Lithonia",
  "country":"USA",
@@ -13,6 +20,11 @@
  "subAddress":"Apt M",
  "uniqueRoomName":"Room One",
  "zipcode":"30058",
+    "inspectors":[{
+     "username": "jforn",
+     "email": "email99",
+     "subscriptionType": "subscriptionType",
+     "password": "password0909"}],
  "reports":[{
                     "rtype":"M",
                     "rname":"report1",
@@ -25,12 +37,7 @@
                             "assets":[{
 								"name": "name1",
 								"type": "type1",
-								"description": "description1",
-								"pictures":[{
-									"latitude": 111.0,
-									"longitude": 112.6,
-									"comment": "comment for pictures - assets"
-									}]                
+								"description": "description1"
 							}],
 							 "notes":[{
 								"itemResolved": true,
@@ -39,12 +46,7 @@
 								"note": "note for notes",
 								"picCounter": 232,
 								"picOrientation": 500,
-								"picScale": 2.9,
-									"pictures":[{
-									"latitude": 11.0,
-									"longitude": 12.6,
-									"comment": "comment for pictures - notes"
-									}]   								               
+								"picScale": 2.9
 							}]               
                     }]
            },
@@ -55,5 +57,5 @@
                     "constructionphase": "final"
            }
            ]
+    }]
 }
-

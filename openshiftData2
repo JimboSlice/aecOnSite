@@ -1,0 +1,9 @@
+mysql-5.1
+---------------------------------
+MySQL 5.1 database added.  Please make note of these credentials:
+       Root User: adminG8kxQVI
+   Root Password: GwJgAHGQKt3f
+   Database Name: onsite
+Connection URL: mysql://$OPENSHIFT_MYSQL_DB_HOST:$OPENSHIFT_MYSQL_DB_PORT/
+You can manage your new MySQL database by also embedding phpmyadmin-3.4.
+The phpmyadmin username and password will be the same as the MySQL credentials above.

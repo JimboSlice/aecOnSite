@@ -6,9 +6,10 @@ import javax.persistence.*;
 
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonManagedReference;
 
 
@@ -19,6 +20,14 @@ import org.codehaus.jackson.annotate.JsonManagedReference;
 @Entity
 @NamedQuery(name="Project.findAll", query="SELECT p FROM Project p")
 public class Project implements Serializable {
+	public Company getCompany() {
+		return company;
+	}
+
+	public void setCompany(Company company) {
+		this.company = company;
+	}
+
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -57,6 +66,11 @@ public class Project implements Serializable {
 
 	private String zipcode;
 	
+	// bi-directional many-to-one association to Project
+	@JsonBackReference("projectref")
+	@ManyToOne(fetch=FetchType.EAGER,cascade=CascadeType.ALL)
+	@JoinColumn(name="Company_companyId")
+	private Company company;
 
 	//bi-directional many-to-one association to Report
 	@JsonManagedReference("reportref")
@@ -75,7 +89,7 @@ public class Project implements Serializable {
             @JoinColumn(name="inspectorId")
             }
         )
-	private Set<Inspector> inspectors = new HashSet<Inspector>(0);
+	private Set<Inspector> inspectors = new LinkedHashSet<Inspector>(0);
 
     
 	public Set<Inspector> getInspectors() {

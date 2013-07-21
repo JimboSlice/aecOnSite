@@ -26,6 +26,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.yenrof.onsite.dataservice.ProjectRepository;
+import com.yenrof.onsite.model.Company;
+import com.yenrof.onsite.model.Inspector;
 import com.yenrof.onsite.model.Project;
 import com.yenrof.onsite.service.ProjectRegistration;
 
@@ -74,15 +76,15 @@ public class ProjectService {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createProject(Project Project) {
+    public Response createProject(Company company) {
 
         Response.ResponseBuilder builder = null;
 
         try {
             //Validates Project using bean validation
-            validateProject(Project);
+            validateCompany(company);
 
-            repository.persist(Project);
+            repository.persist(company);
 
             //Create an "ok" response
             builder = Response.ok();
@@ -102,6 +104,125 @@ public class ProjectService {
         }
 
         return builder.build();
+    }
+    
+    /**
+     * Creates a new Inspector to a Project from the values provided.  Performs validation, and will return a JAX-RS response with either
+     * 200 ok, or with a map of fields, and related errors.
+     */
+    @POST
+    @Path("/addInspector")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response addInspector(Inspector inspector) {
+
+        Response.ResponseBuilder builder = null;
+
+        try {
+            //Validates Project using bean validation
+            validateInspector(inspector);
+
+            repository.persist(inspector);
+
+            //Create an "ok" response
+            builder = Response.ok();
+        } catch (ConstraintViolationException ce) {
+            //Handle bean validation issues
+            builder = createViolationResponse(ce.getConstraintViolations());
+        } catch (ValidationException e) {
+            //Handle the unique constrain violation
+            Map<String, String> responseObj = new HashMap<String, String>();
+            responseObj.put("ssn", "SSN taken");
+            builder = Response.status(Response.Status.CONFLICT).entity(responseObj);
+        } catch (Exception e) {
+            // Handle generic exceptions
+            Map<String, String> responseObj = new HashMap<String, String>();
+            responseObj.put("error", e.getMessage());
+            builder = Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
+        }
+
+        return builder.build();
+    }
+    
+    /**
+     * Creates a new Inspector to a Project from the values provided.  Performs validation, and will return a JAX-RS response with either
+     * 200 ok, or with a map of fields, and related errors.
+     */
+    @POST
+    @Path("/addCompany")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response addCompany(Company company) {
+
+        Response.ResponseBuilder builder = null;
+
+        try {
+            //Validates Project using bean validation
+            validateCompany(company);
+
+            repository.persist(company);
+
+            //Create an "ok" response
+            builder = Response.ok();
+        } catch (ConstraintViolationException ce) {
+            //Handle bean validation issues
+            builder = createViolationResponse(ce.getConstraintViolations());
+        } catch (ValidationException e) {
+            //Handle the unique constrain violation
+            Map<String, String> responseObj = new HashMap<String, String>();
+            responseObj.put("ssn", "SSN taken");
+            builder = Response.status(Response.Status.CONFLICT).entity(responseObj);
+        } catch (Exception e) {
+            // Handle generic exceptions
+            Map<String, String> responseObj = new HashMap<String, String>();
+            responseObj.put("error", e.getMessage());
+            builder = Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
+        }
+
+        return builder.build();
+    }
+    
+    /**
+     * <p>Validates the given Company variable and throws validation exceptions based on the type of error.
+     * If the error is standard bean validation errors then it will throw a ConstraintValidationException
+     * with the set of the constraints violated.</p>
+     * <p>If the error is caused because an existing Company with the same ssn is registered it throws a regular
+     * validation exception so that it can be interpreted separately.</p>
+     *
+     * @param Company company to be validated
+     * @throws ConstraintViolationException If Bean Validation errors exist
+     * @throws ValidationException          If Company with the same  already exists
+     */
+    private void validateCompany(Company company) throws ConstraintViolationException, ValidationException {
+        log.fine("Validate started: " + company.getName());
+    	//Create a bean validator and check for issues.
+        Set<ConstraintViolation<Company>> violations = validator.validate(company);
+
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(new HashSet<ConstraintViolation<?>>(violations));
+        }
+    }
+
+    
+    /**
+     * <p>Validates the given Inspector variable and throws validation exceptions based on the type of error.
+     * If the error is standard bean validation errors then it will throw a ConstraintValidationException
+     * with the set of the constraints violated.</p>
+     * <p>If the error is caused because an existing Inspector with the same ssn is registered it throws a regular
+     * validation exception so that it can be interpreted separately.</p>
+     *
+     * @param Inspector inspector to be validated
+     * @throws ConstraintViolationException If Bean Validation errors exist
+     * @throws ValidationException          If Inspector with the same  already exists
+     */
+    private void validateInspector(Inspector inspector) throws ConstraintViolationException, ValidationException {
+        log.fine("Validate started: " + inspector.getUsername());
+    	//Create a bean validator and check for issues.
+        Set<ConstraintViolation<Inspector>> violations = validator.validate(inspector);
+
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(new HashSet<ConstraintViolation<?>>(violations));
+        }
     }
 
 
@@ -126,9 +247,9 @@ public class ProjectService {
         }
 
         //Check the uniqueness of the ssn
-        /*if (ssnAlreadyExists(Project.getSsn())) {
+        /*if (projectNumberAlreadyExists(Project.getProjectName())) {
             log.info("SSN  violation: " + Project.getProjectName());
-            throw new ValidationException("Unique SSN Violation");
+            throw new ValidationException("Unique ProjectName Violation");
         }*/
     }
 

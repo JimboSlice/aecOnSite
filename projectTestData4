@@ -1,5 +1,5 @@
 {
- "address":"7777 Greenridge Trail",
+ "address":"764344 Greenridge Trail",
  "city":"Lithonia",
  "country":"USA",
  "countryCode":"US",
@@ -13,6 +13,11 @@
  "subAddress":"Apt M",
  "uniqueRoomName":"Room One",
  "zipcode":"30058",
+ "inspectors":[{
+     "username": "jforn",
+     "email": "email99",
+     "subscriptionType": "subscriptionType",
+     "password": "password0909"}],
  "reports":[{
                     "rtype":"M",
                     "rname":"report1",
@@ -56,4 +61,3 @@
            }
            ]
 }
-
