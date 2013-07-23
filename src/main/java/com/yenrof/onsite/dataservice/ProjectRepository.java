@@ -43,6 +43,26 @@ public class ProjectRepository {
 				cb.equal(Project.get("projectNumber"), projectNumber));
 		return em.createQuery(criteria).getSingleResult();
 	}
+	
+	public Inspector findByUserName(String username) {
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<Inspector> criteria = cb.createQuery(Inspector.class);
+		Root<Inspector> Inspector = criteria.from(Inspector.class);
+		criteria.select(Inspector).where(
+				cb.equal(Inspector.get("username"), username));
+		return em.createQuery(criteria).getSingleResult();
+	}
+	
+	public Company findByCompanyName(String name) {
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<Company> criteria = cb.createQuery(Company.class);
+		Root<Company> Company = criteria.from(Company.class);
+		criteria.select(Company).where(
+				cb.equal(Company.get("name"), name));
+		return em.createQuery(criteria).getSingleResult();
+	}
+
+
 
 	public List<Project> findAllOrderedByName() {
 		/*
@@ -65,9 +85,26 @@ public class ProjectRepository {
 
 		return (List<Project>) em.createNativeQuery(select).getResultList();
 	}
+	
+   public void addProject(Company company) throws Exception {
+		log.info("Persisting " + company.getName());
+		Company comp = findByCompanyName(company.getName());
+		Project project=null;
+		Set<Project> projects = company.getProjects();
+		if (projects != null) {
+			Iterator<Project> projectItr = projects.iterator();
+			while (projectItr.hasNext()) {
+			    project = projectItr.next();
+				log.info("project:" + project.getProjectName());
+				project.setCompany(comp);
+				em.persist(project);
+			}
+		}
+   }
+
 
 	//public void persist(Project project) throws Exception {
-    public void persist(Company company) throws Exception {
+    public void persistAll(Company company) throws Exception {
 		log.info("Persisting " + company.getName());
 		Project project=null;
 		Set<Project> projects = company.getProjects();
@@ -77,7 +114,6 @@ public class ProjectRepository {
 			    project = projectItr.next();
 				log.info("note:" + project.getProjectName());
 				project.setCompany(company);
-				//persist(project);
 			}
 		}
 		log.info("Persisting " + project.getProjectName());
@@ -129,20 +165,10 @@ public class ProjectRepository {
 		em.persist(company);
 	}
 	
-	/*public void persist(Company company) throws Exception {
+	public void persist(Company company) throws Exception {
 		log.info("Persisting " + company.getName());
-		Set<Project> projects = company.getProjects();
-		if (projects != null) {
-			Iterator<Project> projectItr = projects.iterator();
-			while (projectItr.hasNext()) {
-				Project project = projectItr.next();
-				log.info("note:" + project.getProjectName());
-				project.setCompany(company);
-				persist(project);
-
-			}
-		}
-	}*/
+		em.persist(company);
+	}
 	
 	public void persist(Inspector inspector) throws Exception {
 		log.info("Persisting " + inspector.getUsername());
