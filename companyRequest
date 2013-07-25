@@ -1,0 +1,10 @@
+{   "address":"7777 Greenridge Trail",
+  	"name":"My Company5",
+    "city":"Lithonia",
+    "state":"NC",
+    "zipcode":"30058",
+    "email":"jforn99@gmail.com",
+    "phone":"6664448888"
+}
+
+http://www.yenrof.com/rest/project/addCompany

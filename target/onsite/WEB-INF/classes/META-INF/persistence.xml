@@ -12,6 +12,7 @@
 		<class>com.yenrof.onsite.model.Asset</class>
 		<class>com.yenrof.onsite.model.Note</class>
 		<class>com.yenrof.onsite.model.Picture</class>
+		<class>com.yenrof.onsite.model.Person</class>
 		<class>com.yenrof.onsite.model.Project</class>
 		<class>com.yenrof.onsite.model.ReferenceData</class>
 		<class>com.yenrof.onsite.model.Report</class>

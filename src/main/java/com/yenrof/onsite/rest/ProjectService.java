@@ -28,7 +28,8 @@ import javax.ws.rs.core.Response;
 
 import com.yenrof.onsite.dataservice.ProjectRepository;
 import com.yenrof.onsite.model.Company;
-import com.yenrof.onsite.model.Inspector;
+import com.yenrof.onsite.model.Person;
+import com.yenrof.onsite.model.Person_HAS_Project;
 import com.yenrof.onsite.model.Project;
 import com.yenrof.onsite.service.ProjectRegistration;
 
@@ -55,9 +56,18 @@ public class ProjectService {
 	ProjectRegistration registration;
 
 	@GET
+	@Path("/projects")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Project> listAllProjects() {
 		return repository.findAllOrderedByName();
+	}
+
+	
+	@GET
+	@Path("/companies")
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<Company> listAllCompanies() {
+		return repository.findAllCompaniesOrderedByName();
 	}
 
 	@GET
@@ -117,18 +127,18 @@ public class ProjectService {
 	 * a map of fields, and related errors.
 	 */
 	@POST
-	@Path("/addInspector")
+	@Path("/addPerson")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response addInspector(Inspector inspector) {
+	public Response addPerson(Person person) {
 
 		Response.ResponseBuilder builder = null;
 
 		try {
 			// Validates Project using bean validation
-			validateInspector(inspector);
+			validatePerson(person);
 
-			repository.persist(inspector);
+			repository.persist(person);
 
 			// Create an "ok" response
 			builder = Response.ok();
@@ -194,7 +204,7 @@ public class ProjectService {
 	}
 
 	/**
-	 * Creates a new Inspector to a Project from the values provided. Performs
+	 * Adds a Project to a Companyfrom the values provided. Performs
 	 * validation, and will return a JAX-RS response with either 200 ok, or with
 	 * a map of fields, and related errors.
 	 */
@@ -215,7 +225,7 @@ public class ProjectService {
 				while (projectItr.hasNext()) {
 					project = projectItr.next();
 					log.info("validating project:" + project.getProjectName());
-					validateProject(project);
+					validateProject(project, company);
 				}
 			}
 
@@ -229,7 +239,57 @@ public class ProjectService {
 		} catch (ValidationException e) {
 			// Handle the unique constrain violation
 			Map<String, String> responseObj = new HashMap<String, String>();
-			responseObj.put("companyName", "Company Name taken");
+			responseObj.put("Project Number", "Project Number taken");
+			builder = Response.status(Response.Status.CONFLICT).entity(
+					responseObj);
+		} catch (Exception e) {
+			// Handle generic exceptions
+			Map<String, String> responseObj = new HashMap<String, String>();
+			responseObj.put("error", e.getMessage());
+			builder = Response.status(Response.Status.BAD_REQUEST).entity(
+					responseObj);
+		}
+
+		return builder.build();
+	}
+	
+	/**
+	 * Adds a Inspector to a Project from the values provided. Performs
+	 * validation, and will return a JAX-RS response with either 200 ok, or with
+	 * a map of fields, and related errors.
+	 */
+	@POST
+	@Path("/addPersonToProject")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response addPersonToProject(Company company) {
+
+		Response.ResponseBuilder builder = null;
+
+		try {
+			// Validates Project using bean validation
+			Project project = null;
+			Set<Project> projects = company.getProjects();
+			if (projects != null) {
+				Iterator<Project> projectItr = projects.iterator();
+				while (projectItr.hasNext()) {
+					project = projectItr.next();
+					log.info("validating project:" + project.getProjectName());
+					validatePersonProject(project, company);
+				}
+			}
+
+			repository.addPersonToProject(company);
+
+			// Create an "ok" response
+			builder = Response.ok();
+		} catch (ConstraintViolationException ce) {
+			// Handle bean validation issues
+			builder = createViolationResponse(ce.getConstraintViolations());
+		} catch (ValidationException e) {
+			// Handle the unique constrain violation
+			Map<String, String> responseObj = new HashMap<String, String>();
+			responseObj.put("Person", "Person Name already associated to project");
 			builder = Response.status(Response.Status.CONFLICT).entity(
 					responseObj);
 		} catch (Exception e) {
@@ -251,7 +311,7 @@ public class ProjectService {
 	 * the constraints violated.
 	 * </p>
 	 * <p>
-	 * If the error is caused because an existing Company with the same ssn is
+	 * If the error is caused because an existing Company with the same name is
 	 * registered it throws a regular validation exception so that it can be
 	 * interpreted separately.
 	 * </p>
@@ -265,7 +325,7 @@ public class ProjectService {
 	 */
 	private void validateCompany(Company company)
 			throws ConstraintViolationException, ValidationException {
-		log.fine("Validate started: " + company.getName());
+		log.fine("validateCompany started: " + company.getName());
 		// Create a bean validator and check for issues.
 		Set<ConstraintViolation<Company>> violations = validator
 				.validate(company);
@@ -277,12 +337,51 @@ public class ProjectService {
 
 		// Check the uniqueness of the company name
 		if (nameAlreadyExists(company.getName())) {
-			log.info("User Name  violation: " + company.getName());
+			log.info("Company Name  violation: " + company.getName());
 			throw new ValidationException("Unique Company Number Violation");
 		}
 
 	}
 
+	/**
+	 * <p>
+	 * Validates the given Person variable and throws validation exceptions
+	 * based on the type of error. If the error is standard bean validation
+	 * errors then it will throw a ConstraintValidationException with the set of
+	 * the constraints violated.
+	 * </p>
+	 * <p>
+	 * If the error is caused because an existing Person with the same
+	 * username is already associated with the project it throws a regular validation exception so that
+	 * it can be interpreted separately.
+	 * </p>
+	 * 
+	 * @param Project
+	 *            Project with Person to be validated
+	 * @throws ConstraintViolationException
+	 *             If Bean Validation errors exist
+	 * @throws ValidationException
+	 *             If Inspector with the same already exists
+	 */
+	private void validatePersonProject(Project project, Company company)
+			throws ConstraintViolationException, ValidationException {
+		log.fine("validatePersonProject started: " + project.getProjectName());
+		// Create a bean validator and check for issues.
+		Set<ConstraintViolation<Project>> violations = validator
+				.validate(project);
+
+		if (!violations.isEmpty()) {
+			throw new ConstraintViolationException(
+					new HashSet<ConstraintViolation<?>>(violations));
+		}
+		// Check the uniqueness of the name
+		if (personProjectAlreadyExists(project, company)){
+			log.info("Person Project Relationship Already Exists  violation: " + project.getProjectName());
+			throw new ValidationException("Person Project Already Exists  Violation");
+		}
+
+	}
+	
 	/**
 	 * <p>
 	 * Validates the given Inspector variable and throws validation exceptions
@@ -296,31 +395,32 @@ public class ProjectService {
 	 * it can be interpreted separately.
 	 * </p>
 	 * 
-	 * @param Inspector
-	 *            inspector to be validated
+	 * @param Person
+	 *            person to be validated
 	 * @throws ConstraintViolationException
 	 *             If Bean Validation errors exist
 	 * @throws ValidationException
 	 *             If Inspector with the same already exists
 	 */
-	private void validateInspector(Inspector inspector)
+	private void validatePerson(Person person)
 			throws ConstraintViolationException, ValidationException {
-		log.fine("Validate started: " + inspector.getUsername());
+		log.fine("Validate started: " + person.getUsername());
 		// Create a bean validator and check for issues.
-		Set<ConstraintViolation<Inspector>> violations = validator
-				.validate(inspector);
+		Set<ConstraintViolation<Person>> violations = validator
+				.validate(person);
 
 		if (!violations.isEmpty()) {
 			throw new ConstraintViolationException(
 					new HashSet<ConstraintViolation<?>>(violations));
 		}
 		// Check the uniqueness of the name
-		if (userNameAlreadyExists(inspector.getUsername())) {
-			log.info("User Name  violation: " + inspector.getUsername());
+		if (userNameAlreadyExists(person.getUsername())) {
+			log.info("User Name  violation: " + person.getUsername());
 			throw new ValidationException("Unique User Number Violation");
 		}
 
 	}
+
 
 	/**
 	 * <p>
@@ -342,9 +442,9 @@ public class ProjectService {
 	 * @throws ValidationException
 	 *             If Project with the same number already exists
 	 */
-	private void validateProject(Project project)
+	private void validateProject(Project project, Company company)
 			throws ConstraintViolationException, ValidationException {
-		log.fine("Validate started: " + project.getProjectName());
+		log.fine("Validate project started: " + project.getProjectName());
 		// Create a bean validator and check for issues.
 		Set<ConstraintViolation<Project>> violations = validator
 				.validate(project);
@@ -355,9 +455,9 @@ public class ProjectService {
 		}
 
 		// Check the uniqueness of the name
-		if (projectNumberAlreadyExists(project.getProjectName())) {
-			log.info("Name  violation: " + project.getProjectName());
-			throw new ValidationException("Unique ProjectName Violation");
+		if (projectNumberAlreadyExists(project, company)) {
+			log.info("Project Number  violation: " + project.getProjectName() + " " + project.getProjectNumber());
+			throw new ValidationException("Unique Project Number Violation");
 		}
 	}
 
@@ -395,14 +495,14 @@ public class ProjectService {
 	 *            The projectNumber to check
 	 * @return True if the projectNumber already exists, and false otherwise
 	 */
-	private boolean projectNumberAlreadyExists(String projectNumber) {
-		Project project = null;
+	private boolean projectNumberAlreadyExists(Project project, Company company) {
+		Project projectdb = null;
 		try {
-			project = repository.findByProjectNumber(projectNumber);
+			projectdb = repository.findByProjectNumber(project, company);
 		} catch (NoResultException e) {
 			// ignore
 		}
-		return project != null;
+		return projectdb != null;
 	}
 
 	/**
@@ -416,13 +516,13 @@ public class ProjectService {
 	 * @return True if the username already exists, and false otherwise
 	 */
 	private boolean userNameAlreadyExists(String username) {
-		Inspector inspector = null;
+		Person person = null;
 		try {
-			inspector = repository.findByUserName(username);
+			person = repository.findByUserName(username);
 		} catch (NoResultException e) {
 			// ignore
 		}
-		return inspector != null;
+		return person != null;
 	}
 
 	/**
@@ -442,5 +542,24 @@ public class ProjectService {
 			// ignore
 		}
 		return company != null;
+	}
+	
+	/**
+	 * Checks if a Person with the same name is already registered with the project. This is the
+	 * only way to easily capture the "@UniqueConstraint(columnNames = "name")"
+	 * constraint from the Person class.
+	 * 
+	 * @param username
+	 *            The name to check
+	 * @return True if the person already exists on the project, and false otherwise
+	 */
+	private boolean personProjectAlreadyExists(Project project, Company company) {
+		Person_HAS_Project personProject = null;
+		try {
+			personProject = repository.findPersonProject(project,company);
+		} catch (NoResultException e) {
+			// ignore
+		}
+		return personProject != null;
 	}
 }

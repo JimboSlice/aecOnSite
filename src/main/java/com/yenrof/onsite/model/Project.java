@@ -12,26 +12,18 @@ import java.util.Set;
 import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonManagedReference;
 
-
 /**
  * The persistent class for the Project database table.
  * 
  */
 @Entity
-@NamedQuery(name="Project.findAll", query="SELECT p FROM Project p")
+@NamedQuery(name = "Project.findAll", query = "SELECT p FROM Project p")
 public class Project implements Serializable {
-	public Company getCompany() {
-		return company;
-	}
-
-	public void setCompany(Company company) {
-		this.company = company;
-	}
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long projectId;
 
 	private String address;
@@ -65,43 +57,39 @@ public class Project implements Serializable {
 	private String uniqueRoomName;
 
 	private String zipcode;
-	
+
+
 	// bi-directional many-to-one association to Project
 	@JsonBackReference("projectref")
-	@ManyToOne(fetch=FetchType.EAGER,cascade=CascadeType.ALL)
-	@JoinColumn(name="Company_companyId")
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn(name = "Company_companyId") //,nullable=false, insertable=false, updatable=false)
 	private Company company;
 
-	//bi-directional many-to-one association to Report
+	// bi-directional many-to-one association to Report
 	@JsonManagedReference("reportref")
-	@OneToMany(fetch=FetchType.EAGER,cascade=CascadeType.ALL, mappedBy="project")
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "project")
 	private Set<Report> reports;
-	
-	  //bi-directional many-to-many association to inspectors with association table
-	//@JsonManagedReference("inspectorref")
-    @ManyToMany(fetch=FetchType.EAGER,cascade=CascadeType.ALL)
-    @JoinTable(
-        name="Inspector_HAS_Project"
-        , joinColumns={
-            @JoinColumn(name="projectId")
-            }
-        , inverseJoinColumns={
-            @JoinColumn(name="inspectorId")
-            }
-        )
-	private Set<Inspector> inspectors = new LinkedHashSet<Inspector>(0);
 
-    
-	public Set<Inspector> getInspectors() {
-		return inspectors;
+	// bi-directional many-to-many association to persons with association
+	// table
+	// @JsonManagedReference("personref")
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinTable(name = "Person_HAS_Project", 
+	joinColumns = { @JoinColumn(name = "projectId", 
+	nullable = false, updatable = false) }, 
+	inverseJoinColumns = { @JoinColumn(name = "personId",
+	nullable = false, updatable = false) })
+	private Set<Person> persons = new LinkedHashSet<Person>(0);
+
+	public Set<Person> getPersons() {
+		return persons;
 	}
-    
+
 	public Project() {
 	}
-	
 
-	public void setInspectors(Set<Inspector> inspectors) {
-		this.inspectors = inspectors;
+	public void setPersons(Set<Person> persons) {
+		this.persons = persons;
 	}
 
 	public static long getSerialversionuid() {
@@ -236,8 +224,6 @@ public class Project implements Serializable {
 		this.uniqueRoomName = uniqueRoomName;
 	}
 
-	
-
 	public String getZipcode() {
 		return this.zipcode;
 	}
@@ -267,5 +253,26 @@ public class Project implements Serializable {
 
 		return report;
 	}
+	
+	public Person addPerson(Person person) {
+		this.getPersons().add(person);
+		person.addProject(this);
+		return person;
+	}
+
+	public Person removeInspector(Person person) {
+		getPersons().remove(person);
+		return person;
+	}
+	
+	public Company getCompany() {
+		return company;
+	}
+
+	public void setCompany(Company company) {
+		this.company = company;
+	}
+
+	
 
 }

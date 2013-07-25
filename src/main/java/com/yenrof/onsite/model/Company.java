@@ -22,7 +22,7 @@ public class Company implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private String companyId;
+	private long companyId;
 
 	private String name;
 
@@ -61,11 +61,11 @@ public class Company implements Serializable {
 	public Company() {
 	}
 
-	public String getCompanyId() {
+	public long getCompanyId() {
 		return companyId;
 	}
 
-	public void setCompanyId(String companyId) {
+	public void setCompanyId(long companyId) {
 		this.companyId = companyId;
 	}
 

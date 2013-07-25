@@ -11,17 +11,17 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 //import org.codehaus.jackson.annotate.JsonManagedReference;
 
 /**
- * The persistent class for the Inspector database table.
+ * The persistent class for the Person database table.
  * 
  */
 @Entity
-@NamedQuery(name = "Inspector.findAll", query = "SELECT a FROM Inspector  a")
-public class Inspector implements Serializable {
+@NamedQuery(name = "Person.findAll", query = "SELECT a FROM Person  a")
+public class Person implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private String inspectorId;
+	private long personId;
 
 	@Column(name = "email")
 	private String email;
@@ -34,13 +34,24 @@ public class Inspector implements Serializable {
 
 	@Column(name = "password")
 	private String password;
+	
+	@Column(name = "role")
+	private String role;
 
    
 	// bi-directional many-to-many association to Projects - DONT NEED IN JSON FORMAT
 	@JsonIgnore
-	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "inspectors")
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "persons")
 	private Set<Project> projects = new LinkedHashSet<Project>(0);
 	
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
+
 	public Set<Project> getProjects() {
 		return projects;
 	}
@@ -49,12 +60,12 @@ public class Inspector implements Serializable {
 		this.projects = projects;
 	}
 
-	public String getInspectorId() {
-		return inspectorId;
+	public long getPersonId() {
+		return personId;
 	}
 
-	public void setInspectorId(String inspectorId) {
-		this.inspectorId = inspectorId;
+	public void setPersonId(long personId) {
+		this.personId = personId;
 	}
 
 	public String getEmail() {
@@ -91,6 +102,16 @@ public class Inspector implements Serializable {
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
+	}
+	
+	public Project addProject(Project project) {
+		this.getProjects().add(project);
+		return project;
+	}
+
+	public Project removeProject(Project project) {
+		getProjects().remove(project);
+		return project;
 	}
 
 }
