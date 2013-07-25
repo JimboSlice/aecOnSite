@@ -3,6 +3,7 @@ package com.yenrof.onsite.dataservice;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 //import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -26,21 +27,21 @@ public class ProjectRepository {
 	@Inject
 	private Logger log;
 
-	public Project findById(long id)  {
+	public Project findById(long id) {
 		Project project = em.find(Project.class, id);
 		return project;
 	}
-	
+
 	public Person_HAS_Project findPersonProject(Project project, Company company) {
-		Person dbPerson=null;
+		Person dbPerson = null;
 		Set<Person> persons = project.getPersons();
 		if (persons != null) {
 			Iterator<Person> itr = persons.iterator();
 			while (itr.hasNext()) {
 				Person person = itr.next();
 				log.info("findPersonProject:" + person.getUsername());
-				dbPerson=findByUserName(person.getUsername());
-				break; //only one Person at a time
+				dbPerson = findByUserName(person.getUsername());
+				break; // only one Person at a time
 			}
 		}
 		Project dbProject = null;
@@ -50,7 +51,7 @@ public class ProjectRepository {
 			while (projectItr.hasNext()) {
 				project = projectItr.next();
 				log.info("findPersonProject:" + project.getProjectName());
-				dbProject = findByProjectNumber(project,  company);
+				dbProject = findByProjectNumber(project, company);
 				break;
 			}
 		}
@@ -59,12 +60,11 @@ public class ProjectRepository {
 		query.setParameter("personId", dbPerson.getPersonId());
 		query.setParameter("projectId", dbProject.getProjectId());
 		return (Person_HAS_Project) query.getSingleResult();
-	
-		
+
 	}
 
-	public Project findByProjectNumber(Project project, Company company)  {
-		
+	public Project findByProjectNumber(Project project, Company company) {
+
 		Company dbCompany = findByCompanyName(company.getName());
 		log.info("findByProjectNumber: projectname " + project.getProjectName());
 		log.info("findByProjectNumber: companyname " + dbCompany.getName());
@@ -80,7 +80,7 @@ public class ProjectRepository {
 		return (Project) query.getSingleResult();
 	}
 
-	public Person findByUserName(String username)  {
+	public Person findByUserName(String username) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Person> criteria = cb.createQuery(Person.class);
 		Root<Person> Inspector = criteria.from(Person.class);
@@ -89,7 +89,7 @@ public class ProjectRepository {
 		return em.createQuery(criteria).getSingleResult();
 	}
 
-	public Company findByCompanyName(String name)  {
+	public Company findByCompanyName(String name) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Company> criteria = cb.createQuery(Company.class);
 		Root<Company> Company = criteria.from(Company.class);
@@ -97,7 +97,7 @@ public class ProjectRepository {
 		return em.createQuery(criteria).getSingleResult();
 	}
 
-	public List<Project> findAllOrderedByName()  {
+	public List<Project> findAllOrderedByName() {
 		String select = "select * from Project order by projectName";
 		return (List<Project>) em.createNativeQuery(select).getResultList();
 	}
@@ -117,26 +117,27 @@ public class ProjectRepository {
 			Iterator<Project> projectsItr = projects.iterator();
 			while (projectsItr.hasNext()) {
 				project = projectsItr.next();
-					// validate project in db
+				// validate project in db
 				Project dbProject = this
 						.findByProjectNumber(project, dbCompany);
 				if (dbProject != null) { // found a project = else throw
 					log.info("adding person for project:"
 							+ project.getProjectName());
-				//	Project projectParm= em.merge(project);
+					// Project projectParm= em.merge(project);
 					Set<Person> persons = project.getPersons();
 					if (persons != null) {
 						Iterator<Person> personsItr = persons.iterator();
 						while (personsItr.hasNext()) {
 							Person person = personsItr.next();
-							Person dbPerson=findByUserName(person.getUsername());
-							if (dbPerson!=null) { //existing user - don't add to Project just add association
+							Person dbPerson = null;
+							try {
+								dbPerson = findByUserName(person.getUsername());
+							 // existing user - don't add to Project just add association
 								Person_HAS_Project php = new Person_HAS_Project();
 								php.setPersonId(dbPerson.getPersonId());
 								php.setProjectId(dbProject.getProjectId());
 								em.persist(php);
-							}
-							else {
+							} catch (NoResultException e) {
 								dbProject.addPerson(person);
 							}
 						}
