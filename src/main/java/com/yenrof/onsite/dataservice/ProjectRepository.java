@@ -107,6 +107,13 @@ public class ProjectRepository {
 		return (List<Company>) em.createNativeQuery(select).getResultList();
 	}
 
+	public List<Project> findAllCompanyProjectsOrderedByName(long companyId) {
+		String select = "SELECT * FROM Project  INNER JOIN Company ON Company.companyId = Project.Company_companyId where Company.companyId=:companyId";
+		Query query = em.createNativeQuery(select, Project.class);
+		query.setParameter("companyId", companyId);
+		return (List<Project>) query.getResultList();
+	}
+
 	public void addPersonToProject(Company company) throws Exception {
 		log.info("Adding person for company " + company.getName());
 		// find the company in db - should throw if not found
@@ -132,7 +139,8 @@ public class ProjectRepository {
 							Person dbPerson = null;
 							try {
 								dbPerson = findByUserName(person.getUsername());
-							 // existing user - don't add to Project just add association
+								// existing user - don't add to Project just add
+								// association
 								Person_HAS_Project php = new Person_HAS_Project();
 								php.setPersonId(dbPerson.getPersonId());
 								php.setProjectId(dbProject.getProjectId());

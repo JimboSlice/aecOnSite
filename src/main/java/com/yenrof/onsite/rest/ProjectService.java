@@ -39,7 +39,7 @@ import com.yenrof.onsite.service.ProjectRegistration;
  * This class produces a RESTful service to read/write the contents of the
  * Project table.
  */
-@Path("/project")
+@Path("/onsite")
 @RequestScoped
 @Stateful
 public class ProjectService {
@@ -56,7 +56,7 @@ public class ProjectService {
 	ProjectRegistration registration;
 
 	@GET
-	@Path("/projects")
+	@Path("/getProjects")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Project> listAllProjects() {
 		return repository.findAllOrderedByName();
@@ -64,21 +64,18 @@ public class ProjectService {
 
 	
 	@GET
-	@Path("/companies")
+	@Path("/getCompanies")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Company> listAllCompanies() {
 		return repository.findAllCompaniesOrderedByName();
 	}
 
 	@GET
-	@Path("/{id:[0-9][0-9]*}")
+	@Path("/getCompanyProjects/{id:[0-9][0-9]*}")
+
 	@Produces(MediaType.APPLICATION_JSON)
-	public Project lookupProjectById(@PathParam("id") long id) {
-		Project Project = repository.findById(id);
-		if (Project == null) {
-			throw new WebApplicationException(Response.Status.NOT_FOUND);
-		}
-		return Project;
+	public List <Project> lookupProjectById(@PathParam("id") long id) {
+		return repository.findAllCompanyProjectsOrderedByName(id);
 	}
 
 	/**
