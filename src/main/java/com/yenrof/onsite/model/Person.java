@@ -5,9 +5,15 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+
+
 
 //import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotEmpty;
+
 //import org.codehaus.jackson.annotate.JsonManagedReference;
 
 /**
@@ -23,27 +29,48 @@ public class Person implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long personId;
 
+	@NotNull
+	@NotEmpty
+	@Email(message = "Invalid format")
 	@Column(name = "email")
 	private String email;
 
+	@NotNull
+	@NotEmpty
 	@Column(name = "username")
 	private String username;
 
 	@Column(name = "subscriptionType")
 	private String subscriptionType;
 
+	@NotNull
+	@NotEmpty
 	@Column(name = "password")
 	private String password;
-	
+
 	@Column(name = "role")
 	private String role;
 
-   
-	// bi-directional many-to-many association to Projects - DONT NEED IN JSON FORMAT
+	// bi-directional many-to-many association to Projects - DONT NEED IN JSON
+	// FORMAT
 	@JsonIgnore
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "persons")
 	private Set<Project> projects = new LinkedHashSet<Project>(0);
-	
+
+	// bi-directional many-to-many association to Company - DONT NEED IN JSON
+	// FORMAT
+	@JsonIgnore
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "persons")
+	private Set<Company> companies = new LinkedHashSet<Company>(0);
+
+	public Set<Company> getCompanies() {
+		return companies;
+	}
+
+	public void setCompanies(Set<Company> companies) {
+		this.companies = companies;
+	}
+
 	public String getRole() {
 		return role;
 	}
@@ -103,7 +130,7 @@ public class Person implements Serializable {
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
-	
+
 	public Project addProject(Project project) {
 		this.getProjects().add(project);
 		return project;
@@ -112,6 +139,11 @@ public class Person implements Serializable {
 	public Project removeProject(Project project) {
 		getProjects().remove(project);
 		return project;
+	}
+	
+	public Company addCompany(Company company) {
+		this.getCompanies().add(company);
+		return company;
 	}
 
 }

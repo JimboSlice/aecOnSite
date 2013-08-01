@@ -3,6 +3,7 @@ package com.yenrof.onsite.model;
 import java.io.Serializable;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -11,6 +12,7 @@ import java.util.Set;
 
 import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonManagedReference;
+import org.hibernate.validator.constraints.NotEmpty;
 
 /**
  * The persistent class for the Project database table.
@@ -44,8 +46,14 @@ public class Project implements Serializable {
 
 	private String neighborhood;
 
+	@NotNull
+	@NotEmpty
+	@Column(name = "projectName")
 	private String projectName;
 
+	@NotNull
+	@NotEmpty
+	@Column(name = "projectNumber")
 	private String projectNumber;
 
 	private String state;

@@ -83,9 +83,9 @@ public class ProjectRepository {
 	public Person findByUserName(String username) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Person> criteria = cb.createQuery(Person.class);
-		Root<Person> Inspector = criteria.from(Person.class);
-		criteria.select(Inspector).where(
-				cb.equal(Inspector.get("username"), username));
+		Root<Person> person = criteria.from(Person.class);
+		criteria.select(person).where(
+				cb.equal(person.get("username"), username));
 		return em.createQuery(criteria).getSingleResult();
 	}
 
@@ -124,13 +124,12 @@ public class ProjectRepository {
 			Iterator<Project> projectsItr = projects.iterator();
 			while (projectsItr.hasNext()) {
 				project = projectsItr.next();
-				// validate project in db
+				// validate project by company in db
 				Project dbProject = this
 						.findByProjectNumber(project, dbCompany);
 				if (dbProject != null) { // found a project = else throw
 					log.info("adding person for project:"
 							+ project.getProjectName());
-					// Project projectParm= em.merge(project);
 					Set<Person> persons = project.getPersons();
 					if (persons != null) {
 						Iterator<Person> personsItr = persons.iterator();
@@ -148,6 +147,7 @@ public class ProjectRepository {
 							} catch (NoResultException e) {
 								dbProject.addPerson(person);
 							}
+							break; // add just one Person
 						}
 					}
 				}
@@ -239,8 +239,21 @@ public class ProjectRepository {
 		em.persist(company);
 	}
 
-	public void persist(Person person) throws Exception {
+	public void persist(Person person, Company company) throws Exception {
 		log.info("Persisting " + person.getUsername());
-		em.persist(person);
+		Company dbCompany = findByCompanyName(company.getName());
+		Person dbPerson = null;
+		try {
+			dbPerson = findByUserName(person.getUsername());
+			// existing user - don't add to Company just add
+			// association
+			Person_HAS_Company phc = new Person_HAS_Company();
+			phc.setPersonId(dbPerson.getPersonId());
+			phc.setCompanyId(dbCompany.getCompanyId());
+			em.persist(phc);
+		} catch (NoResultException e) {
+			dbCompany.addPerson(person);
+			em.persist(dbCompany);
+		}
 	}
 }

@@ -3,27 +3,31 @@ package com.yenrof.onsite.model;
 import java.io.Serializable;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 import org.codehaus.jackson.annotate.JsonManagedReference;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
 
 /**
  * The persistent class for the Company database table.
  * 
  */
 @Entity
-@NamedQuery(name="Company.findAll", query="SELECT c FROM Company c")
+@NamedQuery(name = "Company.findAll", query = "SELECT c FROM Company c")
 public class Company implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long companyId;
 
+	@NotNull
+	@NotEmpty
+	@Column(name = "name")
 	private String name;
 
 	private String address;
@@ -33,15 +37,30 @@ public class Company implements Serializable {
 	private String state;
 
 	private String zipcode;
-	
+
 	private String email;
 
 	private String phone;
-	
 
-	//bi-directional many-to-one association to Project
+	// bi-directional many-to-many association to persons with association
+	// table
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinTable(name = "Person_HAS_Company", 
+	joinColumns = { @JoinColumn(name = "companyId", nullable = false, updatable = false) }, 
+	inverseJoinColumns = { @JoinColumn(name = "personId", nullable = false, updatable = false) })
+	private Set<Person> persons = new LinkedHashSet<Person>(0);
+
+	public Set<Person> getPersons() {
+		return persons;
+	}
+
+	public void setPersons(Set<Person> persons) {
+		this.persons = persons;
+	}
+
+	// bi-directional many-to-one association to Project
 	@JsonManagedReference("projectref")
-	@OneToMany(fetch=FetchType.EAGER,cascade=CascadeType.ALL, mappedBy="company")
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "company")
 	private Set<Project> projects = new LinkedHashSet<Project>(0);
 
 	public Set<Project> getProjects() {
@@ -52,11 +71,8 @@ public class Company implements Serializable {
 		this.projects = projects;
 	}
 
-
 	@Temporal(TemporalType.DATE)
 	private Date timeStamp;
-
-	
 
 	public Company() {
 	}
@@ -133,10 +149,13 @@ public class Company implements Serializable {
 		this.timeStamp = timeStamp;
 	}
 
-
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
-
 	
+	public Person addPerson(Person person) {
+		this.getPersons().add(person);
+		person.addCompany(this);
+		return person;
+	}
 }

@@ -22,7 +22,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
+//import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -62,7 +62,6 @@ public class ProjectService {
 		return repository.findAllOrderedByName();
 	}
 
-	
 	@GET
 	@Path("/getCompanies")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -72,9 +71,8 @@ public class ProjectService {
 
 	@GET
 	@Path("/getCompanyProjects/{id:[0-9][0-9]*}")
-
 	@Produces(MediaType.APPLICATION_JSON)
-	public List <Project> lookupProjectById(@PathParam("id") long id) {
+	public List<Project> lookupProjectById(@PathParam("id") long id) {
 		return repository.findAllCompanyProjectsOrderedByName(id);
 	}
 
@@ -119,23 +117,34 @@ public class ProjectService {
 	}
 
 	/**
-	 * Creates a new Inspector to a Project from the values provided. Performs
-	 * validation, and will return a JAX-RS response with either 200 ok, or with
-	 * a map of fields, and related errors.
+	 * Creates a new Person to a Project for a company from the values provided.
+	 * Performs validation, and will return a JAX-RS response with either 200
+	 * ok, or with a map of fields, and related errors.
 	 */
 	@POST
 	@Path("/addPerson")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response addPerson(Person person) {
+	public Response addPerson(Company company) {
 
 		Response.ResponseBuilder builder = null;
 
 		try {
-			// Validates Project using bean validation
-			validatePerson(person);
+			// Validates Person using bean validation
+			Person person = null;
+			Set<Person> persons = company.getPersons();
+			if (persons != null) {
+				Iterator<Person> personItr = persons.iterator();
+				while (personItr.hasNext()) {
+					person = personItr.next();
+					log.info("validating person:" + person.getUsername());
+					// Validates person using bean validation
+					validatePerson(person);
+					break; // add one only
+				}
+			}
 
-			repository.persist(person);
+			repository.persist(person, company);
 
 			// Create an "ok" response
 			builder = Response.ok();
@@ -201,9 +210,9 @@ public class ProjectService {
 	}
 
 	/**
-	 * Adds a Project to a Companyfrom the values provided. Performs
-	 * validation, and will return a JAX-RS response with either 200 ok, or with
-	 * a map of fields, and related errors.
+	 * Adds a Project to a Companyfrom the values provided. Performs validation,
+	 * and will return a JAX-RS response with either 200 ok, or with a map of
+	 * fields, and related errors.
 	 */
 	@POST
 	@Path("/addProjectToCompany")
@@ -249,7 +258,7 @@ public class ProjectService {
 
 		return builder.build();
 	}
-	
+
 	/**
 	 * Adds a Inspector to a Project from the values provided. Performs
 	 * validation, and will return a JAX-RS response with either 200 ok, or with
@@ -286,7 +295,8 @@ public class ProjectService {
 		} catch (ValidationException e) {
 			// Handle the unique constrain violation
 			Map<String, String> responseObj = new HashMap<String, String>();
-			responseObj.put("Person", "Person Name already associated to project");
+			responseObj.put("Person",
+					"Person Name already associated to project");
 			builder = Response.status(Response.Status.CONFLICT).entity(
 					responseObj);
 		} catch (Exception e) {
@@ -348,9 +358,9 @@ public class ProjectService {
 	 * the constraints violated.
 	 * </p>
 	 * <p>
-	 * If the error is caused because an existing Person with the same
-	 * username is already associated with the project it throws a regular validation exception so that
-	 * it can be interpreted separately.
+	 * If the error is caused because an existing Person with the same username
+	 * is already associated with the project it throws a regular validation
+	 * exception so that it can be interpreted separately.
 	 * </p>
 	 * 
 	 * @param Project
@@ -372,13 +382,15 @@ public class ProjectService {
 					new HashSet<ConstraintViolation<?>>(violations));
 		}
 		// Check the uniqueness of the name
-		if (personProjectAlreadyExists(project, company)){
-			log.info("Person Project Relationship Already Exists  violation: " + project.getProjectName());
-			throw new ValidationException("Person Project Already Exists  Violation");
+		if (personProjectAlreadyExists(project, company)) {
+			log.info("Person Project Relationship Already Exists  violation: "
+					+ project.getProjectName());
+			throw new ValidationException(
+					"Person Project Already Exists  Violation");
 		}
 
 	}
-	
+
 	/**
 	 * <p>
 	 * Validates the given Inspector variable and throws validation exceptions
@@ -418,7 +430,6 @@ public class ProjectService {
 
 	}
 
-
 	/**
 	 * <p>
 	 * Validates the given Project variable and throws validation exceptions
@@ -453,7 +464,8 @@ public class ProjectService {
 
 		// Check the uniqueness of the name
 		if (projectNumberAlreadyExists(project, company)) {
-			log.info("Project Number  violation: " + project.getProjectName() + " " + project.getProjectNumber());
+			log.info("Project Number  violation: " + project.getProjectName()
+					+ " " + project.getProjectNumber());
 			throw new ValidationException("Unique Project Number Violation");
 		}
 	}
@@ -503,7 +515,7 @@ public class ProjectService {
 	}
 
 	/**
-	 * Checks if a Inspector with the same username is already registered. This
+	 * Checks if a Person with the same username is already registered. This
 	 * is the only way to easily capture the
 	 * "@UniqueConstraint(columnNames = "username")" constraint from the Project
 	 * class.
@@ -540,20 +552,22 @@ public class ProjectService {
 		}
 		return company != null;
 	}
-	
+
 	/**
-	 * Checks if a Person with the same name is already registered with the project. This is the
-	 * only way to easily capture the "@UniqueConstraint(columnNames = "name")"
-	 * constraint from the Person class.
+	 * Checks if a Person with the same name is already registered with the
+	 * project. This is the only way to easily capture the
+	 * "@UniqueConstraint(columnNames = "name")" constraint from the Person
+	 * class.
 	 * 
 	 * @param username
 	 *            The name to check
-	 * @return True if the person already exists on the project, and false otherwise
+	 * @return True if the person already exists on the project, and false
+	 *         otherwise
 	 */
 	private boolean personProjectAlreadyExists(Project project, Company company) {
 		Person_HAS_Project personProject = null;
 		try {
-			personProject = repository.findPersonProject(project,company);
+			personProject = repository.findPersonProject(project, company);
 		} catch (NoResultException e) {
 			// ignore
 		}
