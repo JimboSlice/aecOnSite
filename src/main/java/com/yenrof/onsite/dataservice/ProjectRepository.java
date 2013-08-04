@@ -39,8 +39,8 @@ public class ProjectRepository {
 			Iterator<Person> itr = persons.iterator();
 			while (itr.hasNext()) {
 				Person person = itr.next();
-				log.info("findPersonProject:" + person.getUsername());
-				dbPerson = findByUserName(person.getUsername());
+				log.info("findPersonProject:" + person.getEmail());
+				dbPerson = findByUserName(person.getEmail());
 				break; // only one Person at a time
 			}
 		}
@@ -80,14 +80,25 @@ public class ProjectRepository {
 		return (Project) query.getSingleResult();
 	}
 
-	public Person findByUserName(String username) {
+	public Person findByUserName(String email) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Person> criteria = cb.createQuery(Person.class);
 		Root<Person> person = criteria.from(Person.class);
 		criteria.select(person).where(
-				cb.equal(person.get("username"), username));
+				cb.equal(person.get("email"), email));
 		return em.createQuery(criteria).getSingleResult();
 	}
+	
+	
+	
+	public Person checkCredentials(UserCredential userCredential) {
+		String select = "SELECT * FROM Person where email=:email and password=:password";
+		Query query = em.createNativeQuery(select, Person.class);
+		query.setParameter("email", userCredential.getUserName());
+		query.setParameter("password", userCredential.getPassword());
+		return (Person) query.getSingleResult();
+	}
+
 
 	public Company findByCompanyName(String name) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -137,7 +148,7 @@ public class ProjectRepository {
 							Person person = personsItr.next();
 							Person dbPerson = null;
 							try {
-								dbPerson = findByUserName(person.getUsername());
+								dbPerson = findByUserName(person.getEmail());
 								// existing user - don't add to Project just add
 								// association
 								Person_HAS_Project php = new Person_HAS_Project();
@@ -191,7 +202,7 @@ public class ProjectRepository {
 			Iterator<Person> itr = persons.iterator();
 			while (itr.hasNext()) {
 				Person person = itr.next();
-				log.info("person:" + person.getUsername());
+				log.info("person:" + person.getEmail());
 			}
 		}
 		Set<Report> reports = project.getReports();
@@ -240,11 +251,11 @@ public class ProjectRepository {
 	}
 
 	public void persist(Person person, Company company) throws Exception {
-		log.info("Persisting " + person.getUsername());
+		log.info("Persisting " + person.getEmail());
 		Company dbCompany = findByCompanyName(company.getName());
 		Person dbPerson = null;
 		try {
-			dbPerson = findByUserName(person.getUsername());
+			dbPerson = findByUserName(person.getEmail());
 			// existing user - don't add to Company just add
 			// association
 			Person_HAS_Company phc = new Person_HAS_Company();

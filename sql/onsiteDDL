@@ -217,15 +217,14 @@ DROP TABLE IF EXISTS `onsite`.`Person` ;
 SHOW WARNINGS;
 CREATE  TABLE IF NOT EXISTS `onsite`.`Person` (
   `personId` BIGINT NOT NULL AUTO_INCREMENT ,
-  `username` VARCHAR(45) NOT NULL ,
+  `email` VARCHAR(45) NOT NULL ,
   `subscriptionType` VARCHAR(45) NULL ,
-  `email` VARCHAR(45) NULL ,
   `password` VARCHAR(45) NULL ,
   `role` VARCHAR(1) NULL ,
   `timeStamp` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY (`personId`) ,
-  UNIQUE INDEX `username_UNIQUE` (`username` ASC) ,
-  UNIQUE INDEX `inspectorId_UNIQUE` (`personId` ASC) )
+  UNIQUE INDEX `inspectorId_UNIQUE` (`personId` ASC) ,
+  UNIQUE INDEX `email_UNIQUE` (`email` ASC) )
 ENGINE = InnoDB;
 
 SHOW WARNINGS;
@@ -251,6 +250,32 @@ CREATE  TABLE IF NOT EXISTS `onsite`.`Person_HAS_Project` (
   CONSTRAINT `fk_Inspector_has_Project_Project1`
     FOREIGN KEY (`projectId` )
     REFERENCES `onsite`.`Project` (`projectId` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+SHOW WARNINGS;
+
+-- -----------------------------------------------------
+-- Table `onsite`.`Person_HAS_Company`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `onsite`.`Person_HAS_Company` ;
+
+SHOW WARNINGS;
+CREATE  TABLE IF NOT EXISTS `onsite`.`Person_HAS_Company` (
+  `personId` BIGINT NOT NULL ,
+  `companyId` BIGINT NOT NULL ,
+  PRIMARY KEY (`personId`, `companyId`) ,
+  INDEX `fk_Person_has_Company_Company1` (`companyId` ASC) ,
+  INDEX `fk_Person_has_Company_Person1` (`personId` ASC) ,
+  CONSTRAINT `fk_Person_has_Company_Person1`
+    FOREIGN KEY (`personId` )
+    REFERENCES `onsite`.`Person` (`personId` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Person_has_Company_Company1`
+    FOREIGN KEY (`companyId` )
+    REFERENCES `onsite`.`Company` (`companyId` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;

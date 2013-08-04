@@ -35,11 +35,6 @@ public class Person implements Serializable {
 	@Column(name = "email")
 	private String email;
 
-	@NotNull
-	@NotEmpty
-	@Column(name = "username")
-	private String username;
-
 	@Column(name = "subscriptionType")
 	private String subscriptionType;
 
@@ -101,14 +96,6 @@ public class Person implements Serializable {
 
 	public void setEmail(String email) {
 		this.email = email;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
 	}
 
 	public String getSubscriptionType() {
