@@ -1,27 +1,19 @@
-package com.yenrof.onsite.model;
+package com.yenrof.onsite.dto;
 
 import java.io.Serializable;
-
-import javax.persistence.*;
+import java.util.Date;
+import java.util.Set;
 
 import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonManagedReference;
 
-import java.util.Date;
-import java.util.Set;
-
-
 /**
- * The persistent class for the Area database table.
+ * The DTO class for the Area database table.
  * 
  */
-@Entity
-@NamedQuery(name="Area.findAll", query="SELECT a FROM Area a")
-public class Area implements Serializable {
+public class AreaDTO implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long areaId;
 
 	private String comment;
@@ -30,30 +22,16 @@ public class Area implements Serializable {
 
 	private String number;
 
-	@Temporal(TemporalType.DATE)
 	private Date timeStamp;
-
-	//bi-directional many-to-one association to Report
-	@ManyToOne
+	
 	@JsonBackReference
-	@JoinColumn(name="Report_reportId", referencedColumnName="reportId")
-	private Report report;
-
-	//bi-directional many-to-one association to Asset
-	@OneToMany(fetch=FetchType.LAZY,cascade = CascadeType.ALL,mappedBy="area")
-//	@IndexColumn(name="assetId")
-	//@LazyCollection(LazyCollectionOption.FALSE)
+	private ReportDTO report;
 	@JsonManagedReference
-	private Set<Asset> assets;
-
-	//bi-directional many-to-one association to Note
-	@OneToMany(fetch=FetchType.LAZY,cascade = CascadeType.ALL,mappedBy="area")
-	//@IndexColumn(name="noteId")
-	//@LazyCollection(LazyCollectionOption.FALSE)
+	private Set<AssetDTO> assets;
 	@JsonManagedReference
-	private Set<Note> notes;
+	private Set<NoteDTO> notes;
 
-	public Area() {
+	public AreaDTO() {
 	}
 
 	public long getAreaId() {
@@ -96,53 +74,52 @@ public class Area implements Serializable {
 		this.timeStamp = timeStamp;
 	}
 
-	
-	public Report getReport() {
+	public ReportDTO getReport() {
 		return this.report;
 	}
 
-	public void setReport(Report report) {
+	public void setReport(ReportDTO report) {
 		this.report = report;
 	}
 
-	public Set<Asset> getAssets() {
+	public Set<AssetDTO> getAssets() {
 		return this.assets;
 	}
 
-	public void setAssets(Set<Asset> assets) {
+	public void setAssets(Set<AssetDTO> assets) {
 		this.assets = assets;
 	}
 
-	public Asset addAsset(Asset asset) {
+	public AssetDTO addAsset(AssetDTO asset) {
 		getAssets().add(asset);
 		asset.setArea(this);
 
 		return asset;
 	}
 
-	public Asset removeAsset(Asset asset) {
+	public AssetDTO removeAsset(AssetDTO asset) {
 		getAssets().remove(asset);
 		asset.setArea(null);
 
 		return asset;
 	}
 
-	public Set<Note> getNotes() {
+	public Set<NoteDTO> getNotes() {
 		return this.notes;
 	}
 
-	public void setNotes(Set<Note> notes) {
+	public void setNotes(Set<NoteDTO> notes) {
 		this.notes = notes;
 	}
 
-	public Note addNote(Note note) {
+	public NoteDTO addNote(NoteDTO note) {
 		getNotes().add(note);
 		note.setArea(this);
 
 		return note;
 	}
 
-	public Note removeNote(Note note) {
+	public NoteDTO removeNote(NoteDTO note) {
 		getNotes().remove(note);
 		note.setArea(null);
 

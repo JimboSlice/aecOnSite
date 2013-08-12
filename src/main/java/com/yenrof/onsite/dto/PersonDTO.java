@@ -1,68 +1,45 @@
-package com.yenrof.onsite.model;
+ package com.yenrof.onsite.dto;
 
 import java.io.Serializable;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 
-
-
-//import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonIgnore;
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.NotEmpty;
 
-//import org.codehaus.jackson.annotate.JsonManagedReference;
+
 
 /**
- * The persistent class for the Person database table.
+ * The DTO class for the Person database table.
  * 
  */
-@Entity
-@NamedQuery(name = "Person.findAll", query = "SELECT a FROM Person  a")
-public class Person implements Serializable {
+public class PersonDTO implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long personId;
 
-	@NotNull
-	@NotEmpty
-	@Email(message = "Invalid format")
-	@Column(name = "email")
 	private String email;
 
-	@Column(name = "subscriptionType")
 	private String subscriptionType;
-
-	@NotNull
-	@NotEmpty
-	@Column(name = "password")
 	private String password;
-
-	@Column(name = "role")
+	
 	private String role;
-
+	
+	
 	// bi-directional many-to-many association to Projects - DONT NEED IN JSON
 	// FORMAT
 	@JsonIgnore
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "persons")
-	private Set<Project> projects = new LinkedHashSet<Project>(0);
-
+	private Set<ProjectDTO> projects = new LinkedHashSet<ProjectDTO>(0);
 	// bi-directional many-to-many association to Company - DONT NEED IN JSON
 	// FORMAT
 	@JsonIgnore
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "persons")
-	private Set<Company> companies = new LinkedHashSet<Company>(0);
+	private Set<CompanyDTO> companies = new LinkedHashSet<CompanyDTO>(0);
 
-	public Set<Company> getCompanies() {
+	public Set<CompanyDTO> getCompanies() {
 		return companies;
 	}
 
-	public void setCompanies(Set<Company> companies) {
+	public void setCompanies(Set<CompanyDTO> companies) {
 		this.companies = companies;
 	}
 
@@ -74,11 +51,11 @@ public class Person implements Serializable {
 		this.role = role;
 	}
 
-	public Set<Project> getProjects() {
+	public Set<ProjectDTO> getProjects() {
 		return projects;
 	}
 
-	public void setProjects(Set<Project> projects) {
+	public void setProjects(Set<ProjectDTO> projects) {
 		this.projects = projects;
 	}
 
@@ -118,19 +95,19 @@ public class Person implements Serializable {
 		return serialVersionUID;
 	}
 
-	public Project addProject(Project project) {
+/*	public ProjectDTO addProject(ProjectDTO project) {
 		this.getProjects().add(project);
 		return project;
 	}
 
-	public Project removeProject(Project project) {
+	public ProjectDTO removeProject(ProjectDTO project) {
 		getProjects().remove(project);
 		return project;
 	}
-	
-	public Company addCompany(Company company) {
+
+	public CompanyDTO addCompany(CompanyDTO company) {
 		this.getCompanies().add(company);
 		return company;
-	}
+	}*/
 
 }

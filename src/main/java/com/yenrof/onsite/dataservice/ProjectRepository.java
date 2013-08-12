@@ -10,12 +10,26 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-//import java.util.HashSet;
+import ma.glasnost.orika.BoundMapperFacade;
+import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.impl.DefaultMapperFactory;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import com.yenrof.onsite.dto.AreaDTO;
+import com.yenrof.onsite.dto.AssetDTO;
+import com.yenrof.onsite.dto.CompanyDTO;
+import com.yenrof.onsite.dto.NoteDTO;
+import com.yenrof.onsite.dto.OnsiteKeyDTO;
+import com.yenrof.onsite.dto.PersonDTO;
+import com.yenrof.onsite.dto.ProjectDTO;
+import com.yenrof.onsite.dto.ReportDTO;
 import com.yenrof.onsite.model.*;
 
 @ApplicationScoped
@@ -32,22 +46,23 @@ public class ProjectRepository {
 		return project;
 	}
 
-	public Person_HAS_Project findPersonProject(Project project, Company company) {
+	public Person_HAS_Project findPersonProject(ProjectDTO project,
+			CompanyDTO company) {
 		Person dbPerson = null;
-		Set<Person> persons = project.getPersons();
+		Set<PersonDTO> persons = project.getPersons();
 		if (persons != null) {
-			Iterator<Person> itr = persons.iterator();
+			Iterator<PersonDTO> itr = persons.iterator();
 			while (itr.hasNext()) {
-				Person person = itr.next();
+				PersonDTO person = itr.next();
 				log.info("findPersonProject:" + person.getEmail());
 				dbPerson = findByUserName(person.getEmail());
 				break; // only one Person at a time
 			}
 		}
 		Project dbProject = null;
-		Set<Project> projects = company.getProjects();
+		Set<ProjectDTO> projects = company.getProjects();
 		if (projects != null) {
-			Iterator<Project> projectItr = projects.iterator();
+			Iterator<ProjectDTO> projectItr = projects.iterator();
 			while (projectItr.hasNext()) {
 				project = projectItr.next();
 				log.info("findPersonProject:" + project.getProjectName());
@@ -55,7 +70,7 @@ public class ProjectRepository {
 				break;
 			}
 		}
-		String select = "SELECT * FROM mydb.Person_HAS_Project where personId=:personId and projectId=:projectId";
+		String select = "SELECT * FROM Person_HAS_Project where personId=:personId and projectId=:projectId";
 		Query query = em.createNativeQuery(select, Person_HAS_Project.class);
 		query.setParameter("personId", dbPerson.getPersonId());
 		query.setParameter("projectId", dbProject.getProjectId());
@@ -63,7 +78,7 @@ public class ProjectRepository {
 
 	}
 
-	public Project findByProjectNumber(Project project, Company company) {
+	public Project findByProjectNumber(ProjectDTO project, CompanyDTO company) {
 
 		Company dbCompany = findByCompanyName(company.getName());
 		log.info("findByProjectNumber: projectname " + project.getProjectName());
@@ -84,21 +99,40 @@ public class ProjectRepository {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Person> criteria = cb.createQuery(Person.class);
 		Root<Person> person = criteria.from(Person.class);
-		criteria.select(person).where(
-				cb.equal(person.get("email"), email));
+		criteria.select(person).where(cb.equal(person.get("email"), email));
 		return em.createQuery(criteria).getSingleResult();
 	}
-	
-	
-	
-	public Person checkCredentials(UserCredential userCredential) {
-		String select = "SELECT * FROM Person where email=:email and password=:password";
-		Query query = em.createNativeQuery(select, Person.class);
+
+	public OnsiteKeyDTO checkCredentials(UserCredential userCredential) {
+		String select = "SELECT DISTINCT Person.personId,  Project.Company_companyId FROM Person " +
+						"INNER JOIN Person_HAS_Project ON Person_HAS_Project.personId = Person.personId " +
+						"INNER JOIN Project ON Project.projectId = Person_HAS_Project.projectId " +
+						"where Person.email=:email and Person.password=:password";
+		Query query = em.createNativeQuery(select);
 		query.setParameter("email", userCredential.getUserName());
 		query.setParameter("password", userCredential.getPassword());
-		return (Person) query.getSingleResult();
+		Object[] result = null;
+		OnsiteKeyDTO onsiteKeyDTO=null;
+		try{
+			result = (Object[]) query.getSingleResult();
+			onsiteKeyDTO=new OnsiteKeyDTO();
+			BigInteger personId = (BigInteger) result[0];
+			BigInteger companyId = (BigInteger) result[1];
+			onsiteKeyDTO.setPersonId(personId.longValue());
+			onsiteKeyDTO.setCompanyId(companyId.longValue());
+		}
+		catch (NoResultException nre){
+			//Ignore this is ok!
+		}			
+		return onsiteKeyDTO; 		
 	}
 
+	
+	
+	public CompanyDTO findByCompanyId(long id) {
+		Company company = em.find(Company.class, id);
+		return (CompanyDTO) map(company);
+	}
 
 	public Company findByCompanyName(String name) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -108,44 +142,73 @@ public class ProjectRepository {
 		return em.createQuery(criteria).getSingleResult();
 	}
 
-	public List<Project> findAllOrderedByName() {
+	public List<ProjectDTO> findAllOrderedByName() {
 		String select = "select * from Project order by projectName";
-		return (List<Project>) em.createNativeQuery(select).getResultList();
+		return (List<ProjectDTO>) em.createNativeQuery(select).getResultList();
 	}
 
-	public List<Company> findAllCompaniesOrderedByName() {
+	public List<CompanyDTO> findAllCompaniesOrderedByName() {
+		List <CompanyDTO> companies = new ArrayList<CompanyDTO>(0);
 		String select = "select * from Company order by name";
-		return (List<Company>) em.createNativeQuery(select).getResultList();
+		Query query = em.createNativeQuery(select, Company.class);
+		List<Object> list = query.getResultList();
+		Company company=null;
+	
+		if (list != null) {
+			Iterator<Object> companyItr = list.iterator();
+			while (companyItr.hasNext()) {
+				company = (Company) companyItr.next();
+				companies.add((CompanyDTO) map(company));
+			}
+		}
+		return companies;
 	}
 
-	public List<Project> findAllCompanyProjectsOrderedByName(long companyId) {
-		String select = "SELECT * FROM Project  INNER JOIN Company ON Company.companyId = Project.Company_companyId where Company.companyId=:companyId";
+	public List<ProjectDTO> findAllCompanyProjectsOrderedByName(long companyId) {
+		String select = "SELECT * FROM Project INNER JOIN Company ON Company.companyId = Project.Company_companyId where Company.companyId=:companyId";
 		Query query = em.createNativeQuery(select, Project.class);
 		query.setParameter("companyId", companyId);
-		return (List<Project>) query.getResultList();
+		return (List<ProjectDTO>) query.getResultList();
 	}
 
-	public void addPersonToProject(Company company) throws Exception {
+	public List<ProjectDTO> findAllPersonProjectsOrderedByName(long personId) {
+		List <ProjectDTO> projects = new ArrayList<ProjectDTO>(0);
+		String select = "SELECT * FROM Project INNER JOIN Person_HAS_Project ON Person_HAS_Project.projectId = Project.projectId where Person_HAS_Project.personId=:personId";
+		Query query = em.createNativeQuery(select, Project.class);
+		query.setParameter("personId", personId);
+		List<Object> list = query.getResultList();
+		Project project=null;
+	
+		if (list != null) {
+			Iterator<Object> projectItr = list.iterator();
+			while (projectItr.hasNext()) {
+				project = (Project) projectItr.next();
+				projects.add((ProjectDTO) map(project));
+			}
+		}
+		return projects;
+	}
+
+	public void addPersonToProject(CompanyDTO company) throws Exception {
 		log.info("Adding person for company " + company.getName());
 		// find the company in db - should throw if not found
-		Company dbCompany = findByCompanyName(company.getName());
-		Project project = null;
-		Set<Project> projects = company.getProjects();
+		// Company dbCompany = findByCompanyName(company.getName());
+		ProjectDTO project = null;
+		Set<ProjectDTO> projects = company.getProjects();
 		if (projects != null) {
-			Iterator<Project> projectsItr = projects.iterator();
+			Iterator<ProjectDTO> projectsItr = projects.iterator();
 			while (projectsItr.hasNext()) {
 				project = projectsItr.next();
 				// validate project by company in db
-				Project dbProject = this
-						.findByProjectNumber(project, dbCompany);
+				Project dbProject = this.findByProjectNumber(project, company);
 				if (dbProject != null) { // found a project = else throw
 					log.info("adding person for project:"
 							+ project.getProjectName());
-					Set<Person> persons = project.getPersons();
+					Set<PersonDTO> persons = project.getPersons();
 					if (persons != null) {
-						Iterator<Person> personsItr = persons.iterator();
+						Iterator<PersonDTO> personsItr = persons.iterator();
 						while (personsItr.hasNext()) {
-							Person person = personsItr.next();
+							PersonDTO person = personsItr.next();
 							Person dbPerson = null;
 							try {
 								dbPerson = findByUserName(person.getEmail());
@@ -166,91 +229,100 @@ public class ProjectRepository {
 		}
 	}
 
-	public void addProject(Company company) throws Exception {
+	public void addProject(CompanyDTO company) throws Exception {
 		log.info("Persisting projects for" + company.getName());
 		Company dbCompany = findByCompanyName(company.getName());
-		Project project = null;
-		Set<Project> projects = company.getProjects();
+		ProjectDTO project = null;
+		Set<ProjectDTO> projects = company.getProjects();
 		if (projects != null) {
-			Iterator<Project> projectItr = projects.iterator();
+			Iterator<ProjectDTO> projectItr = projects.iterator();
 			while (projectItr.hasNext()) {
 				project = projectItr.next();
 				log.info("project:" + project.getProjectName());
 				log.info("companyId:" + dbCompany.getCompanyId());
-				project.setCompany(dbCompany);
+				Project dbProject = (Project) map(project); // convert to entity
+				dbProject.setCompany(dbCompany);
 				em.persist(project);
 			}
 		}
 	}
 
 	// public void persist(Project project) throws Exception {
-	public void persistAll(Company company) throws Exception {
+	public void persistAll(CompanyDTO company) throws Exception {
 		log.info("Persisting " + company.getName());
-		Project project = null;
-		Set<Project> projects = company.getProjects();
+		Company dbCompany = (Company) map(company);
+		ProjectDTO project = null;
+		Project dbProject = null;
+		Set<ProjectDTO> projects = company.getProjects();
 		if (projects != null) {
-			Iterator<Project> projectItr = projects.iterator();
+			Iterator<ProjectDTO> projectItr = projects.iterator();
 			while (projectItr.hasNext()) {
 				project = projectItr.next();
-				log.info("note:" + project.getProjectName());
-				project.setCompany(company);
+				log.info("project:" + project.getProjectName());
+				dbProject = (Project) map(project);
+				dbProject.setCompany(dbCompany);
+				break;
 			}
 		}
-		log.info("Persisting " + project.getProjectName());
-		Set<Person> persons = project.getPersons();
+		log.info("Persisting " + dbProject.getProjectName());
+		Set<PersonDTO> persons = project.getPersons();
 		if (persons != null) {
-			Iterator<Person> itr = persons.iterator();
+			Iterator<PersonDTO> itr = persons.iterator();
 			while (itr.hasNext()) {
-				Person person = itr.next();
+				PersonDTO person = itr.next();
 				log.info("person:" + person.getEmail());
+				dbProject.addPerson((Person) map(person));
 			}
 		}
-		Set<Report> reports = project.getReports();
+		Set<ReportDTO> reports = project.getReports();
 		if (reports != null) {
-			Iterator<Report> itr = reports.iterator();
+			Iterator<ReportDTO> itr = reports.iterator();
 			while (itr.hasNext()) {
-				Report report = itr.next();
+				ReportDTO report = itr.next();
 				log.info("report:" + report.getRname());
-				report.setProject(project);
-				Set<Area> areas = report.getAreas();
+				Report dbReport = (Report) map(report);
+				dbReport.setProject(dbProject);
+				Set<AreaDTO> areas = report.getAreas();
 				if (areas != null) {
-					Iterator<Area> areasItr = areas.iterator();
+					Iterator<AreaDTO> areasItr = areas.iterator();
 					while (areasItr.hasNext()) {
-						Area area = areasItr.next();
+						AreaDTO area = areasItr.next();
 						log.info("area:" + area.getNumber());
-						area.setReport(report);
-						Set<Asset> assets = area.getAssets();
+						Area dbArea = (Area) map(area);
+						dbArea.setReport(dbReport);
+						Set<AssetDTO> assets = area.getAssets();
 						if (assets != null) {
-							Iterator<Asset> assetItr = assets.iterator();
+							Iterator<AssetDTO> assetItr = assets.iterator();
 							while (assetItr.hasNext()) {
-								Asset asset = assetItr.next();
+								AssetDTO asset = assetItr.next();
 								log.info("asset:" + asset.getDescription());
-								asset.setArea(area);
+								Asset dbAsset = (Asset) map(asset);
+								dbAsset.setArea(dbArea);
 							}
 						}
-						Set<Note> notes = area.getNotes();
+						Set<NoteDTO> notes = area.getNotes();
 						if (notes != null) {
-							Iterator<Note> noteItr = notes.iterator();
+							Iterator<NoteDTO> noteItr = notes.iterator();
 							while (noteItr.hasNext()) {
-								Note note = noteItr.next();
+								NoteDTO note = noteItr.next();
 								log.info("note:" + note.getNote());
-								note.setArea(area);
-
+								Note dbNote = (Note) map(note);
+								dbNote.setArea(dbArea);
 							}
 						}
 					}
 				}
 			}
 		}
-		em.persist(company);
+		em.persist(dbCompany);
 	}
 
-	public void persist(Company company) throws Exception {
+	public void persist(CompanyDTO company) throws Exception {
 		log.info("Persisting " + company.getName());
-		em.persist(company);
+		em.persist(company); // JKF
 	}
 
-	public void persist(Person person, Company company) throws Exception {
+	public void persist(PersonDTO person, CompanyDTO company) throws Exception {
 		log.info("Persisting " + person.getEmail());
 		Company dbCompany = findByCompanyName(company.getName());
 		Person dbPerson = null;
@@ -263,8 +335,107 @@ public class ProjectRepository {
 			phc.setCompanyId(dbCompany.getCompanyId());
 			em.persist(phc);
 		} catch (NoResultException e) {
-			dbCompany.addPerson(person);
+			dbCompany.addPerson((Person) map(person)); // JKF
 			em.persist(dbCompany);
 		}
 	}
+
+	protected Object map(NoteDTO noteDTO) {
+		MapperFactory mapperFactory = new DefaultMapperFactory.Builder()
+				.build();
+		BoundMapperFacade<NoteDTO, Note> boundMapper = mapperFactory
+				.getMapperFacade(NoteDTO.class, Note.class);
+		Note note = boundMapper.map(noteDTO);
+		return note;
+	}
+
+	protected Object map(AreaDTO areaDTO) {
+		MapperFactory mapperFactory = new DefaultMapperFactory.Builder()
+				.build();
+		BoundMapperFacade<AreaDTO, Area> boundMapper = mapperFactory
+				.getMapperFacade(AreaDTO.class, Area.class);
+		Area area = boundMapper.map(areaDTO);
+		return area;
+	}
+
+	protected Object map(AssetDTO assetDTO) {
+		MapperFactory mapperFactory = new DefaultMapperFactory.Builder()
+				.build();
+		BoundMapperFacade<AssetDTO, Asset> boundMapper = mapperFactory
+				.getMapperFacade(AssetDTO.class, Asset.class);
+		// map the fields of 'source' onto a new instance of PersonDest
+		Asset asset = boundMapper.map(assetDTO);
+		return asset;
+	}
+
+	protected Object map(ReportDTO reportDTO) {
+		MapperFactory mapperFactory = new DefaultMapperFactory.Builder()
+				.build();
+		BoundMapperFacade<ReportDTO, Report> boundMapper = mapperFactory
+				.getMapperFacade(ReportDTO.class, Report.class);
+		// map the fields of 'source' onto a new instance of PersonDest
+		Report report = boundMapper.map(reportDTO);
+		return report;
+	}
+
+	protected Object map(PersonDTO personDTO) {
+		MapperFactory mapperFactory = new DefaultMapperFactory.Builder()
+				.build();
+		BoundMapperFacade<PersonDTO, Person> boundMapper = mapperFactory
+				.getMapperFacade(PersonDTO.class, Person.class);
+		// map the fields of 'source' onto a new instance of PersonDest
+		Person person = boundMapper.map(personDTO);
+		return person;
+	}
+
+	protected Object map(CompanyDTO companyDTO) {
+		MapperFactory mapperFactory = new DefaultMapperFactory.Builder()
+				.build();
+		BoundMapperFacade<CompanyDTO, Company> boundMapper = mapperFactory
+				.getMapperFacade(CompanyDTO.class, Company.class);
+		// map the fields of 'source' onto a new instance of PersonDest
+		Company company = boundMapper.map(companyDTO);
+		return company;
+	}
+
+	protected Object map(ProjectDTO projectDTO) {
+		MapperFactory mapperFactory = new DefaultMapperFactory.Builder()
+				.build();
+		BoundMapperFacade<ProjectDTO, Project> boundMapper = mapperFactory
+				.getMapperFacade(ProjectDTO.class, Project.class);
+		// map the fields of 'source' onto a new instance of PersonDest
+		Project project = boundMapper.map(projectDTO);
+		return project;
+	}
+
+	protected Object map(Company company) {
+		MapperFactory mapperFactory = new DefaultMapperFactory.Builder()
+				.build();
+		BoundMapperFacade<Company, CompanyDTO> boundMapper = mapperFactory
+				.getMapperFacade(Company.class, CompanyDTO.class);
+		// map the fields of 'source' onto a new instance of PersonDest
+		CompanyDTO companyDTO = boundMapper.map(company);
+		return companyDTO;
+	}
+
+	protected Object map(Person person) {
+		MapperFactory mapperFactory = new DefaultMapperFactory.Builder()
+				.build();
+		BoundMapperFacade<Person, PersonDTO> boundMapper = mapperFactory
+				.getMapperFacade(Person.class, PersonDTO.class);
+		// map the fields of 'source' onto a new instance of PersonDest
+		PersonDTO personDTO = boundMapper.map(person);
+		return personDTO;
+	}
+	
+	protected Object map(Project project) {
+		MapperFactory mapperFactory = new DefaultMapperFactory.Builder()
+				.build();
+		BoundMapperFacade<Project, ProjectDTO> boundMapper = mapperFactory
+				.getMapperFacade(Project.class, ProjectDTO.class);
+		// map the fields of 'source' onto a new instance of PersonDest
+		ProjectDTO projectDTO = boundMapper.map(project);
+		return projectDTO;
+	}
+
 }

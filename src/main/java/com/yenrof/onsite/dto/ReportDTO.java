@@ -1,27 +1,20 @@
-package com.yenrof.onsite.model;
+package com.yenrof.onsite.dto;
 
 import java.io.Serializable;
-
-import javax.persistence.*;
-
-import org.codehaus.jackson.annotate.JsonBackReference;
-import org.codehaus.jackson.annotate.JsonManagedReference;
-
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Set;
 
+import org.codehaus.jackson.annotate.JsonBackReference;
+import org.codehaus.jackson.annotate.JsonManagedReference;
+
 /**
- * The persistent class for the Report database table.
+ * The DTO class for the Report database table.
  * 
  */
-@Entity
-@NamedQuery(name = "Report.findAll", query = "SELECT r FROM Report r")
-public class Report implements Serializable {
+public class ReportDTO implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long reportId;
 
 	private String constructionphase;
@@ -32,22 +25,13 @@ public class Report implements Serializable {
 
 	private String rtype;
 
-	//@Temporal(TemporalType.TIMESTAMP
 	private Timestamp timeStamp;
-
-
-	// bi-directional many-to-one association to Project
 	@JsonBackReference("reportref")
-	@ManyToOne(fetch=FetchType.LAZY,cascade=CascadeType.ALL)
-	@JoinColumn(name="Project_projectId")
-	private Project project;
-
-	// bi-directional many-to-one association to Area
+	private ProjectDTO project;
 	@JsonManagedReference
-	@OneToMany(fetch=FetchType.LAZY,cascade = CascadeType.ALL, mappedBy = "report")
-	private Set<Area> areas;
+	private Set<AreaDTO> areas;
 
-	public Report() {
+	public ReportDTO() {
 	}
 
 	public long getReportId() {
@@ -98,34 +82,33 @@ public class Report implements Serializable {
 		this.timeStamp = timeStamp;
 	}
 
-	
-	public Set<Area> getAreas() {
+	public Set<AreaDTO> getAreas() {
 		return this.areas;
 	}
 
-	public void setAreas(Set<Area> areas) {
+	public void setAreas(Set<AreaDTO> areas) {
 		this.areas = areas;
 	}
 
-	public Area addArea(Area area) {
+	public AreaDTO addArea(AreaDTO area) {
 		getAreas().add(area);
 		area.setReport(this);
 
 		return area;
 	}
 
-	public Area removeArea(Area area) {
+	public AreaDTO removeArea(AreaDTO area) {
 		getAreas().remove(area);
 		area.setReport(null);
 
 		return area;
 	}
 
-	public Project getProject() {
+	public ProjectDTO getProject() {
 		return this.project;
 	}
 
-	public void setProject(Project project) {
+	public void setProject(ProjectDTO project) {
 		this.project = project;
 	}
 

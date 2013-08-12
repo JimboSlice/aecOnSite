@@ -20,9 +20,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-
-import com.yenrof.onsite.model.Company;
-import com.yenrof.onsite.model.Person;
+import com.yenrof.onsite.dto.CompanyDTO;
+import com.yenrof.onsite.dto.PersonDTO;
+import com.yenrof.onsite.dto.ProjectDTO;
 import com.yenrof.onsite.model.Project;
 
 /**
@@ -40,22 +40,36 @@ public class ProjectService  extends Service {
 	@GET
 	@Path("/getProjects")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Project> listAllProjects() {
+	public List<ProjectDTO> listAllProjects() {
 		return repository.findAllOrderedByName();
 	}
 
 	@GET
 	@Path("/getCompanies")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Company> listAllCompanies() {
+	public List<CompanyDTO> listAllCompanies() {
 		return repository.findAllCompaniesOrderedByName();
+	}
+	
+	@GET
+	@Path("/getCompany/{id:[0-9][0-9]*}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public CompanyDTO findCompany(@PathParam("id") long id) {
+		return repository.findByCompanyId(id);
 	}
 
 	@GET
 	@Path("/getCompanyProjects/{id:[0-9][0-9]*}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Project> lookupProjectById(@PathParam("id") long id) {
+	public List<ProjectDTO> lookupProjectById(@PathParam("id") long id) {
 		return repository.findAllCompanyProjectsOrderedByName(id);
+	}
+
+	@GET
+	@Path("/getPersonProjects/{id:[0-9][0-9]*}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<ProjectDTO> lookupProjectByPersonId(@PathParam("id") long id) {
+		return repository.findAllPersonProjectsOrderedByName(id);
 	}
 
 	/**
@@ -66,7 +80,7 @@ public class ProjectService  extends Service {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response createCompany(Company company) {
+	public Response createCompany(CompanyDTO company) {
 
 		Response.ResponseBuilder builder = null;
 
@@ -107,16 +121,16 @@ public class ProjectService  extends Service {
 	@Path("/addPerson")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response addPerson(Company company) {
+	public Response addPerson(CompanyDTO company) {
 
 		Response.ResponseBuilder builder = null;
 
 		try {
 			// Validates Person using bean validation
-			Person person = null;
-			Set<Person> persons = company.getPersons();
+			PersonDTO person = null;
+			Set<PersonDTO> persons = company.getPersons();
 			if (persons != null) {
-				Iterator<Person> personItr = persons.iterator();
+				Iterator<PersonDTO> personItr = persons.iterator();
 				while (personItr.hasNext()) {
 					person = personItr.next();
 					log.info("validating person:" + person.getEmail());
@@ -159,7 +173,7 @@ public class ProjectService  extends Service {
 	@Path("/addCompany")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response addCompany(Company company) {
+	public Response addCompany(CompanyDTO company) {
 
 		Response.ResponseBuilder builder = null;
 
@@ -200,16 +214,16 @@ public class ProjectService  extends Service {
 	@Path("/addProjectToCompany")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response addProjectToCompany(Company company) {
+	public Response addProjectToCompany(CompanyDTO company) {
 
 		Response.ResponseBuilder builder = null;
 
 		try {
 			// Validates Project using bean validation
-			Project project = null;
-			Set<Project> projects = company.getProjects();
+			ProjectDTO project = null;
+			Set<ProjectDTO> projects = company.getProjects();
 			if (projects != null) {
-				Iterator<Project> projectItr = projects.iterator();
+				Iterator<ProjectDTO> projectItr = projects.iterator();
 				while (projectItr.hasNext()) {
 					project = projectItr.next();
 					log.info("validating project:" + project.getProjectName());
@@ -250,16 +264,16 @@ public class ProjectService  extends Service {
 	@Path("/addPersonToProject")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response addPersonToProject(Company company) {
+	public Response addPersonToProject(CompanyDTO company) {
 
 		Response.ResponseBuilder builder = null;
 
 		try {
 			// Validates Project using bean validation
-			Project project = null;
-			Set<Project> projects = company.getProjects();
+			ProjectDTO project = null;
+			Set<ProjectDTO> projects = company.getProjects();
 			if (projects != null) {
-				Iterator<Project> projectItr = projects.iterator();
+				Iterator<ProjectDTO> projectItr = projects.iterator();
 				while (projectItr.hasNext()) {
 					project = projectItr.next();
 					log.info("validating project:" + project.getProjectName());

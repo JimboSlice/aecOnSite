@@ -1,9 +1,8 @@
-package com.yenrof.onsite.model;
+package com.yenrof.onsite.dto;
 
 import java.io.Serializable;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -12,22 +11,15 @@ import java.util.Set;
 
 import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonManagedReference;
-import org.hibernate.validator.constraints.NotEmpty;
-
-import com.yenrof.onsite.dto.PersonDTO;
-
 /**
- * The persistent class for the Project database table.
+ * The DTO class for the Project database table.
  * 
  */
-@Entity
-@NamedQuery(name = "Project.findAll", query = "SELECT p FROM Project p")
-public class Project implements Serializable {
+public class ProjectDTO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	
 	private long projectId;
 
 	private String address;
@@ -47,15 +39,8 @@ public class Project implements Serializable {
 	private float longcoord;
 
 	private String neighborhood;
-
-	@NotNull
-	@NotEmpty
-	@Column(name = "projectName")
 	private String projectName;
 
-	@NotNull
-	@NotEmpty
-	@Column(name = "projectNumber")
 	private String projectNumber;
 
 	private String state;
@@ -67,38 +52,23 @@ public class Project implements Serializable {
 	private String uniqueRoomName;
 
 	private String zipcode;
-
-
-	// bi-directional many-to-one association to Project
+	
 	@JsonBackReference("projectref")
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn(name = "Company_companyId") //,nullable=false, insertable=false, updatable=false)
-	private Company company;
+	private CompanyDTO company;
 
-	// bi-directional many-to-one association to Report
 	@JsonManagedReference("reportref")
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "project")
-	private Set<Report> reports;
+	private Set<ReportDTO> reports;
+	
+	private Set<PersonDTO> persons = new LinkedHashSet<PersonDTO>(0);
 
-	// bi-directional many-to-many association to persons with association
-	// table
-	// @JsonManagedReference("personref")
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinTable(name = "Person_HAS_Project", 
-	joinColumns = { @JoinColumn(name = "projectId", 
-	nullable = false, updatable = false) }, 
-	inverseJoinColumns = { @JoinColumn(name = "personId",
-	nullable = false, updatable = false) })
-	private Set<Person> persons = new LinkedHashSet<Person>(0);
-
-	public Set<Person> getPersons() {
+	public Set<PersonDTO> getPersons() {
 		return persons;
 	}
 
-	public Project() {
+	public ProjectDTO() {
 	}
 
-	public void setPersons(Set<Person> persons) {
+	public void setPersons(Set<PersonDTO> persons) {
 		this.persons = persons;
 	}
 
@@ -242,50 +212,44 @@ public class Project implements Serializable {
 		this.zipcode = zipcode;
 	}
 
-	public Set<Report> getReports() {
+	public Set<ReportDTO> getReports() {
 		return this.reports;
 	}
 
-	public void setReports(Set<Report> reports) {
+	public void setReports(Set<ReportDTO> reports) {
 		this.reports = reports;
 	}
 
-	public Report addReport(Report report) {
+	public ReportDTO addReport(ReportDTO report) {
 		getReports().add(report);
 		report.setProject(this);
 
 		return report;
 	}
 
-	public Report removeReport(Report report) {
+	public ReportDTO removeReport(ReportDTO report) {
 		getReports().remove(report);
 		report.setProject(null);
 
 		return report;
 	}
 	
-	public Person addPerson(Person person) {
-		this.getPersons().add(person);
-		person.addProject(this);
-		return person;
-	}
-	
 	public PersonDTO addPerson(PersonDTO person) {
-// JKF
+		this.getPersons().add(person);
+		//person.addProject(this);
 		return person;
 	}
 
-
-	public Person removeInspector(Person person) {
+	public PersonDTO removeInspector(PersonDTO person) {
 		getPersons().remove(person);
 		return person;
 	}
 	
-	public Company getCompany() {
+	public CompanyDTO getCompany() {
 		return company;
 	}
 
-	public void setCompany(Company company) {
+	public void setCompany(CompanyDTO company) {
 		this.company = company;
 	}
 
