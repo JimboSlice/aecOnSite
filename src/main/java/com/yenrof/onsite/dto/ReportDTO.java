@@ -28,7 +28,7 @@ public class ReportDTO implements Serializable {
 	private Timestamp timeStamp;
 	@JsonBackReference("reportref")
 	private ProjectDTO project;
-	@JsonManagedReference
+	@JsonManagedReference("arearef")
 	private Set<AreaDTO> areas;
 
 	public ReportDTO() {

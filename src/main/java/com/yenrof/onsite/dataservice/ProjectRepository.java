@@ -17,7 +17,6 @@ import ma.glasnost.orika.impl.DefaultMapperFactory;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -31,6 +30,7 @@ import com.yenrof.onsite.dto.PersonDTO;
 import com.yenrof.onsite.dto.ProjectDTO;
 import com.yenrof.onsite.dto.ReportDTO;
 import com.yenrof.onsite.model.*;
+import com.yenrof.onsite.request.AddPersonToProjectRequest;
 
 @ApplicationScoped
 public class ProjectRepository {
@@ -46,47 +46,34 @@ public class ProjectRepository {
 		return project;
 	}
 
-	public Person_HAS_Project findPersonProject(ProjectDTO project,
-			CompanyDTO company) {
+	public Company findCompanyById(long id) {
+		Company company = em.find(Company.class, id);
+		return company;
+	}
+
+	public Person_HAS_Project findPersonProject(
+			AddPersonToProjectRequest addPersonToProjectRequest) {
 		Person dbPerson = null;
-		Set<PersonDTO> persons = project.getPersons();
-		if (persons != null) {
-			Iterator<PersonDTO> itr = persons.iterator();
-			while (itr.hasNext()) {
-				PersonDTO person = itr.next();
-				log.info("findPersonProject:" + person.getEmail());
-				dbPerson = findByUserName(person.getEmail());
-				break; // only one Person at a time
-			}
-		}
-		Project dbProject = null;
-		Set<ProjectDTO> projects = company.getProjects();
-		if (projects != null) {
-			Iterator<ProjectDTO> projectItr = projects.iterator();
-			while (projectItr.hasNext()) {
-				project = projectItr.next();
-				log.info("findPersonProject:" + project.getProjectName());
-				dbProject = findByProjectNumber(project, company);
-				break;
-			}
-		}
+		log.info("findPersonProject:"
+				+ addPersonToProjectRequest.getPerson().getEmail());
+		dbPerson = findByUserName(addPersonToProjectRequest.getPerson()
+				.getEmail());
 		String select = "SELECT * FROM Person_HAS_Project where personId=:personId and projectId=:projectId";
 		Query query = em.createNativeQuery(select, Person_HAS_Project.class);
 		query.setParameter("personId", dbPerson.getPersonId());
-		query.setParameter("projectId", dbProject.getProjectId());
+		query.setParameter("projectId",
+				addPersonToProjectRequest.getProjectId());
 		return (Person_HAS_Project) query.getSingleResult();
 
 	}
 
-	public Project findByProjectNumber(ProjectDTO project, CompanyDTO company) {
-
-		Company dbCompany = findByCompanyName(company.getName());
+	public Project findByProjectNumber(ProjectDTO project, long companyId) {
+		Company dbCompany = findCompanyById(companyId);
 		log.info("findByProjectNumber: projectname " + project.getProjectName());
 		log.info("findByProjectNumber: companyname " + dbCompany.getName());
 		log.info("findByProjectNumber: companyid " + dbCompany.getCompanyId());
 
 		String number = project.getProjectNumber();
-		long companyId = dbCompany.getCompanyId();
 		String select = "SELECT * FROM Project  INNER JOIN Company ON Company.companyId = "
 				+ "Project.Company_companyId where Project.projectNumber=:number and Company.companyId=:companyId";
 		Query query = em.createNativeQuery(select, Project.class);
@@ -104,31 +91,28 @@ public class ProjectRepository {
 	}
 
 	public OnsiteKeyDTO checkCredentials(UserCredential userCredential) {
-		String select = "SELECT DISTINCT Person.personId,  Project.Company_companyId FROM Person " +
-						"INNER JOIN Person_HAS_Project ON Person_HAS_Project.personId = Person.personId " +
-						"INNER JOIN Project ON Project.projectId = Person_HAS_Project.projectId " +
-						"where Person.email=:email and Person.password=:password";
+		String select = "SELECT DISTINCT Person.personId,  Project.Company_companyId FROM Person "
+				+ "INNER JOIN Person_HAS_Project ON Person_HAS_Project.personId = Person.personId "
+				+ "INNER JOIN Project ON Project.projectId = Person_HAS_Project.projectId "
+				+ "where Person.email=:email and Person.password=:password";
 		Query query = em.createNativeQuery(select);
 		query.setParameter("email", userCredential.getUserName());
 		query.setParameter("password", userCredential.getPassword());
 		Object[] result = null;
-		OnsiteKeyDTO onsiteKeyDTO=null;
-		try{
+		OnsiteKeyDTO onsiteKeyDTO = null;
+		try {
 			result = (Object[]) query.getSingleResult();
-			onsiteKeyDTO=new OnsiteKeyDTO();
+			onsiteKeyDTO = new OnsiteKeyDTO();
 			BigInteger personId = (BigInteger) result[0];
 			BigInteger companyId = (BigInteger) result[1];
 			onsiteKeyDTO.setPersonId(personId.longValue());
 			onsiteKeyDTO.setCompanyId(companyId.longValue());
+		} catch (NoResultException nre) {
+			// Ignore this is ok!
 		}
-		catch (NoResultException nre){
-			//Ignore this is ok!
-		}			
-		return onsiteKeyDTO; 		
+		return onsiteKeyDTO;
 	}
 
-	
-	
 	public CompanyDTO findByCompanyId(long id) {
 		Company company = em.find(Company.class, id);
 		return (CompanyDTO) map(company);
@@ -148,12 +132,12 @@ public class ProjectRepository {
 	}
 
 	public List<CompanyDTO> findAllCompaniesOrderedByName() {
-		List <CompanyDTO> companies = new ArrayList<CompanyDTO>(0);
+		List<CompanyDTO> companies = new ArrayList<CompanyDTO>(0);
 		String select = "select * from Company order by name";
 		Query query = em.createNativeQuery(select, Company.class);
 		List<Object> list = query.getResultList();
-		Company company=null;
-	
+		Company company = null;
+
 		if (list != null) {
 			Iterator<Object> companyItr = list.iterator();
 			while (companyItr.hasNext()) {
@@ -172,13 +156,13 @@ public class ProjectRepository {
 	}
 
 	public List<ProjectDTO> findAllPersonProjectsOrderedByName(long personId) {
-		List <ProjectDTO> projects = new ArrayList<ProjectDTO>(0);
+		List<ProjectDTO> projects = new ArrayList<ProjectDTO>(0);
 		String select = "SELECT * FROM Project INNER JOIN Person_HAS_Project ON Person_HAS_Project.projectId = Project.projectId where Person_HAS_Project.personId=:personId";
 		Query query = em.createNativeQuery(select, Project.class);
 		query.setParameter("personId", personId);
 		List<Object> list = query.getResultList();
-		Project project=null;
-	
+		Project project = null;
+
 		if (list != null) {
 			Iterator<Object> projectItr = list.iterator();
 			while (projectItr.hasNext()) {
@@ -189,62 +173,40 @@ public class ProjectRepository {
 		return projects;
 	}
 
-	public void addPersonToProject(CompanyDTO company) throws Exception {
-		log.info("Adding person for company " + company.getName());
+	public void addPersonToProject(
+			AddPersonToProjectRequest addPersonToProjectRequest)
+			throws Exception {
+		log.info("Adding person for company "
+				+ addPersonToProjectRequest.getCompanyId());
 		// find the company in db - should throw if not found
-		// Company dbCompany = findByCompanyName(company.getName());
-		ProjectDTO project = null;
-		Set<ProjectDTO> projects = company.getProjects();
-		if (projects != null) {
-			Iterator<ProjectDTO> projectsItr = projects.iterator();
-			while (projectsItr.hasNext()) {
-				project = projectsItr.next();
-				// validate project by company in db
-				Project dbProject = this.findByProjectNumber(project, company);
-				if (dbProject != null) { // found a project = else throw
-					log.info("adding person for project:"
-							+ project.getProjectName());
-					Set<PersonDTO> persons = project.getPersons();
-					if (persons != null) {
-						Iterator<PersonDTO> personsItr = persons.iterator();
-						while (personsItr.hasNext()) {
-							PersonDTO person = personsItr.next();
-							Person dbPerson = null;
-							try {
-								dbPerson = findByUserName(person.getEmail());
-								// existing user - don't add to Project just add
-								// association
-								Person_HAS_Project php = new Person_HAS_Project();
-								php.setPersonId(dbPerson.getPersonId());
-								php.setProjectId(dbProject.getProjectId());
-								em.persist(php);
-							} catch (NoResultException e) {
-								dbProject.addPerson(person);
-							}
-							break; // add just one Person
-						}
-					}
-				}
-			}
+		PersonDTO person = addPersonToProjectRequest.getPerson();
+		Person dbPerson = null;
+		try {
+			dbPerson = findByUserName(person.getEmail());
+			// existing user - don't add to Project just add
+			// association
+			Person_HAS_Project php = new Person_HAS_Project();
+			php.setPersonId(dbPerson.getPersonId());
+			php.setProjectId(addPersonToProjectRequest.getProjectId());
+			em.persist(php);
+		} catch (NoResultException e) {
+		    dbPerson = (Person) map(person); // convert to entity
+		    Project dbProject = this.findById(addPersonToProjectRequest.getProjectId());
+		    dbProject.addPerson(dbPerson);
+			em.persist(dbProject);
 		}
 	}
 
-	public void addProject(CompanyDTO company) throws Exception {
-		log.info("Persisting projects for" + company.getName());
-		Company dbCompany = findByCompanyName(company.getName());
-		ProjectDTO project = null;
-		Set<ProjectDTO> projects = company.getProjects();
-		if (projects != null) {
-			Iterator<ProjectDTO> projectItr = projects.iterator();
-			while (projectItr.hasNext()) {
-				project = projectItr.next();
-				log.info("project:" + project.getProjectName());
-				log.info("companyId:" + dbCompany.getCompanyId());
-				Project dbProject = (Project) map(project); // convert to entity
-				dbProject.setCompany(dbCompany);
-				em.persist(project);
-			}
-		}
+	public long persist(ProjectDTO project, long companyId) throws Exception {
+		Company dbCompany = findCompanyById(companyId);
+		log.info("Persisting projects for" + dbCompany.getName());
+		log.info("project:" + project.getProjectName());
+		log.info("companyId:" + dbCompany.getCompanyId());
+		Project dbProject = (Project) map(project); // convert to entity
+		dbProject.setCompany(dbCompany);
+		em.persist(dbProject);
+		Project dbProject2 = findByProjectNumber(project, companyId);
+		return dbProject2.getProjectId();
 	}
 
 	// public void persist(Project project) throws Exception {
@@ -317,14 +279,17 @@ public class ProjectRepository {
 		em.persist(dbCompany);
 	}
 
-	public void persist(CompanyDTO company) throws Exception {
+	public long persist(CompanyDTO company) throws Exception {
 		log.info("Persisting " + company.getName());
-		em.persist(company); // JKF
+		em.persist((Company) (map(company)));
+		Company dbCompany = findByCompanyName(company.getName());
+		return dbCompany.getCompanyId();
+
 	}
 
-	public void persist(PersonDTO person, CompanyDTO company) throws Exception {
+	public long persist(PersonDTO person, long companyId) throws Exception {
 		log.info("Persisting " + person.getEmail());
-		Company dbCompany = findByCompanyName(company.getName());
+		Company dbCompany = findCompanyById(companyId);
 		Person dbPerson = null;
 		try {
 			dbPerson = findByUserName(person.getEmail());
@@ -334,9 +299,12 @@ public class ProjectRepository {
 			phc.setPersonId(dbPerson.getPersonId());
 			phc.setCompanyId(dbCompany.getCompanyId());
 			em.persist(phc);
+			return dbPerson.getPersonId();
 		} catch (NoResultException e) {
 			dbCompany.addPerson((Person) map(person)); // JKF
 			em.persist(dbCompany);
+			dbPerson = findByUserName(person.getEmail());
+			return dbPerson.getPersonId();
 		}
 	}
 
@@ -427,7 +395,7 @@ public class ProjectRepository {
 		PersonDTO personDTO = boundMapper.map(person);
 		return personDTO;
 	}
-	
+
 	protected Object map(Project project) {
 		MapperFactory mapperFactory = new DefaultMapperFactory.Builder()
 				.build();

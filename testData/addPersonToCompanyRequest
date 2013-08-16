@@ -1,0 +1,9 @@
+{ "name":"My Company5",
+     "persons": [   
+     {
+     "email": "email99@gmail.com",
+     "subscriptionType": "subscriptionType",
+     "password": "password0909"
+     }
+   ]
+}

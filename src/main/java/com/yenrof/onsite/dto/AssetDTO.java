@@ -38,7 +38,7 @@ public class AssetDTO implements Serializable {
 
 	private String type;
 
-	@JsonBackReference
+	@JsonBackReference("assetref")
 	private AreaDTO area;
 
 	public AssetDTO() {

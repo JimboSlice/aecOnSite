@@ -40,14 +40,14 @@ public class Area implements Serializable {
 	private Report report;
 
 	//bi-directional many-to-one association to Asset
-	@OneToMany(fetch=FetchType.LAZY,cascade = CascadeType.ALL,mappedBy="area")
+	@OneToMany(fetch=FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE},mappedBy="area")
 //	@IndexColumn(name="assetId")
 	//@LazyCollection(LazyCollectionOption.FALSE)
 	@JsonManagedReference
 	private Set<Asset> assets;
 
 	//bi-directional many-to-one association to Note
-	@OneToMany(fetch=FetchType.LAZY,cascade = CascadeType.ALL,mappedBy="area")
+	@OneToMany(fetch=FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE},mappedBy="area")
 	//@IndexColumn(name="noteId")
 	//@LazyCollection(LazyCollectionOption.FALSE)
 	@JsonManagedReference

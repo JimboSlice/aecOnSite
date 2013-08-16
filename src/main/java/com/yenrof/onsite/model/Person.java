@@ -9,6 +9,8 @@ import javax.validation.constraints.NotNull;
 
 
 
+
+
 //import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.validator.constraints.Email;
@@ -49,13 +51,13 @@ public class Person implements Serializable {
 	// bi-directional many-to-many association to Projects - DONT NEED IN JSON
 	// FORMAT
 	@JsonIgnore
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "persons")
+	@ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "persons")
 	private Set<Project> projects = new LinkedHashSet<Project>(0);
 
 	// bi-directional many-to-many association to Company - DONT NEED IN JSON
 	// FORMAT
 	@JsonIgnore
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "persons")
+	@ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "persons")
 	private Set<Company> companies = new LinkedHashSet<Company>(0);
 
 	public Set<Company> getCompanies() {

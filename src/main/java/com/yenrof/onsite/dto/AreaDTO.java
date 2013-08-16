@@ -24,11 +24,11 @@ public class AreaDTO implements Serializable {
 
 	private Date timeStamp;
 	
-	@JsonBackReference
+	@JsonBackReference("arearef")
 	private ReportDTO report;
-	@JsonManagedReference
+	@JsonManagedReference("assetref")
 	private Set<AssetDTO> assets;
-	@JsonManagedReference
+	@JsonManagedReference("noteref")
 	private Set<NoteDTO> notes;
 
 	public AreaDTO() {

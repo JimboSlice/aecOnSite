@@ -1,11 +1,5 @@
-{   "address":"7777 Greenridge Trail",
-  	"name":"My Company5",
-    "city":"Lithonia",
-    "state":"NC",
-    "zipcode":"30058",
-    "email":"jforn99@gmail.com",
-    "phone":"6664448888",
-    "projects":[{
+{ "companyId":"01",
+    "project":{
  "address":"7777 Greenridge Trail",
  "city":"Lithonia",
  "country":"USA",
@@ -14,12 +8,12 @@
  "latcoord":0.0,
  "longcoord":0.0,
  "neighborhood": "Greenridge",
- "projectName":"TestProject1",
- "projectNumber":"1234567890",
+ "projectName":"Test",
+ "projectNumber":"999",
  "state":"GA",
  "subAddress":"Apt M",
  "uniqueRoomName":"Room One"
- }]
+ }
  }
  
- http://www.yenrof.com/rest/project/addProjectToCompany
+ http://www.yenrof.com/rest/onsite/addProject

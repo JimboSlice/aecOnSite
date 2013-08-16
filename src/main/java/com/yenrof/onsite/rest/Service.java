@@ -14,6 +14,7 @@ import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.ws.rs.core.Response;
 
+import com.yenrof.onsite.request.AddPersonToProjectRequest;
 import com.yenrof.onsite.dataservice.ProjectRepository;
 import com.yenrof.onsite.dto.CompanyDTO;
 import com.yenrof.onsite.dto.OnsiteKeyDTO;
@@ -142,21 +143,21 @@ public class Service {
 	 * @throws ValidationException
 	 *             If Inspector with the same already exists
 	 */
-	protected void validatePersonProject(ProjectDTO project, CompanyDTO company)
+	protected void validatePersonProject(AddPersonToProjectRequest addPersonToProjectRequest)
 			throws ConstraintViolationException, ValidationException {
-		log.fine("validatePersonProject started: " + project.getProjectName());
+		log.fine("validatePersonProject started: " + addPersonToProjectRequest.getProjectId());
 		// Create a bean validator and check for issues.
-		Set<ConstraintViolation<ProjectDTO>> violations = validator
-				.validate(project);
+		Set<ConstraintViolation<PersonDTO>> violations = validator
+				.validate(addPersonToProjectRequest.getPerson());
 
 		if (!violations.isEmpty()) {
 			throw new ConstraintViolationException(
 					new HashSet<ConstraintViolation<?>>(violations));
 		}
 		// Check the uniqueness of the name
-		if (personProjectAlreadyExists(project, company)) {
+		if (personProjectAlreadyExists(addPersonToProjectRequest)) {
 			log.info("Person Project Relationship Already Exists  violation: "
-					+ project.getProjectName());
+					+ addPersonToProjectRequest.getProjectId() + addPersonToProjectRequest.getPerson().getPersonId());
 			throw new ValidationException(
 					"Person Project Already Exists  Violation");
 		}
@@ -260,7 +261,7 @@ public class Service {
 	 * @throws ValidationException
 	 *             If Project with the same number already exists
 	 */
-	protected void validateProject(ProjectDTO project, CompanyDTO company)
+	protected void validateProject(ProjectDTO project, long companyId)
 			throws ConstraintViolationException, ValidationException {
 		log.fine("Validate project started: " + project.getProjectName());
 		// Create a bean validator and check for issues.
@@ -273,7 +274,7 @@ public class Service {
 		}
 
 		// Check the uniqueness of the name
-		if (projectNumberAlreadyExists(project, company)) {
+		if (projectNumberAlreadyExists(project, companyId)) {
 			log.info("Project Number  violation: " + project.getProjectName()
 					+ " " + project.getProjectNumber());
 			throw new ValidationException("Unique Project Number Violation");
@@ -314,10 +315,10 @@ public class Service {
 	 *            The projectNumber to check
 	 * @return True if the projectNumber already exists, and false otherwise
 	 */
-	protected boolean projectNumberAlreadyExists(ProjectDTO project, CompanyDTO company) {
+	protected boolean projectNumberAlreadyExists(ProjectDTO project, long companyId) {
 		Project projectdb = null;
 		try {
-			projectdb = repository.findByProjectNumber(project, company);
+			projectdb = repository.findByProjectNumber(project, companyId);
 		} catch (NoResultException e) {
 			// ignore
 		}
@@ -374,10 +375,10 @@ public class Service {
 	 * @return True if the person already exists on the project, and false
 	 *         otherwise
 	 */
-	protected boolean personProjectAlreadyExists(ProjectDTO project, CompanyDTO company) {
+	protected boolean personProjectAlreadyExists(AddPersonToProjectRequest addPersonToProjectRequest) {
 		Person_HAS_Project personProject = null;
 		try {
-			personProject = repository.findPersonProject(project, company);
+			personProject = repository.findPersonProject( addPersonToProjectRequest);
 		} catch (NoResultException e) {
 			// ignore
 		}

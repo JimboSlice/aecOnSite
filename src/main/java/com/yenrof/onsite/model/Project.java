@@ -71,19 +71,19 @@ public class Project implements Serializable {
 
 	// bi-directional many-to-one association to Project
 	@JsonBackReference("projectref")
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name = "Company_companyId") //,nullable=false, insertable=false, updatable=false)
 	private Company company;
 
 	// bi-directional many-to-one association to Report
 	@JsonManagedReference("reportref")
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "project")
+	@OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "project")
 	private Set<Report> reports;
 
 	// bi-directional many-to-many association to persons with association
 	// table
 	// @JsonManagedReference("personref")
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinTable(name = "Person_HAS_Project", 
 	joinColumns = { @JoinColumn(name = "projectId", 
 	nullable = false, updatable = false) }, 

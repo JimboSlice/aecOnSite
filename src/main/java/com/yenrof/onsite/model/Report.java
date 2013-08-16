@@ -38,13 +38,13 @@ public class Report implements Serializable {
 
 	// bi-directional many-to-one association to Project
 	@JsonBackReference("reportref")
-	@ManyToOne(fetch=FetchType.LAZY,cascade=CascadeType.ALL)
+	@ManyToOne(fetch=FetchType.LAZY,cascade={CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name="Project_projectId")
 	private Project project;
 
 	// bi-directional many-to-one association to Area
 	@JsonManagedReference
-	@OneToMany(fetch=FetchType.LAZY,cascade = CascadeType.ALL, mappedBy = "report")
+	@OneToMany(fetch=FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "report")
 	private Set<Area> areas;
 
 	public Report() {

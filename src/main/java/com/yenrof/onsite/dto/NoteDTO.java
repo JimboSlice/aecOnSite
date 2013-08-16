@@ -3,6 +3,8 @@ package com.yenrof.onsite.dto;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.codehaus.jackson.annotate.JsonBackReference;
+
 
 /**
  * The DTO class for the Note database table.
@@ -34,7 +36,8 @@ public class NoteDTO implements Serializable {
 	private Date timeStamp;
 
 	private byte trackableActionItem;
-
+	
+	@JsonBackReference("noteref")
 	private AreaDTO area;
 
 	public NoteDTO() {

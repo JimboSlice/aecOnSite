@@ -30,31 +30,27 @@ import com.yenrof.onsite.model.UserCredential;
 @Stateful
 public class LoginService extends Service {
 
-	
-
-
-		
 	/**
-	 * Validates user credentials */
+	 * Validates user credentials
+	 */
 	@GET
 	@Path("/checkCredentials/{username}-{password}")
-
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public OnsiteKeyDTO checkCredentials(@PathParam("username") String username, 
-										 @PathParam("password") String password) {
+	public Response checkCredentials(@PathParam("username") String username,
+			@PathParam("password") String password) {
 
 		Response.ResponseBuilder builder = null;
-		OnsiteKeyDTO person=null;
+		OnsiteKeyDTO person = null;
 		try {
-			
+
 			UserCredential userCredential = new UserCredential();
 			userCredential.setUsername(username);
 			userCredential.setPassword(password);
 			// Validates Company using bean validation
-			person= validateUserCredentials(userCredential );
+			person = validateUserCredentials(userCredential);
 			// Create an "ok" response
-			//builder = Response.ok();
+			builder = Response.ok(person);
 		} catch (ConstraintViolationException ce) {
 			// Handle bean validation issues
 			builder = createViolationResponse(ce.getConstraintViolations());
@@ -72,8 +68,7 @@ public class LoginService extends Service {
 			builder = Response.status(Response.Status.BAD_REQUEST).entity(
 					responseObj);
 		}
-		return person;
+		return builder.build();
 	}
-
 
 }

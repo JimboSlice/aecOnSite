@@ -1,9 +1,11 @@
+{ "companyId":"01",
+     "person":  
      {
-     "username": "jforn",
-     "email": "email99",
+     "email": "email1119ccc9@gmail.com",
      "subscriptionType": "subscriptionType",
-     "role": "A",
      "password": "password0909"
      }
+}
 
-http://www.yenrof.com/rest/project/addPerson
+
+http://www.yenrof.com/rest/onsite/addPerson

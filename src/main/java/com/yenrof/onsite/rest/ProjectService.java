@@ -1,10 +1,8 @@
 package com.yenrof.onsite.rest;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.ejb.Stateful;
 import javax.enterprise.context.RequestScoped;
@@ -16,14 +14,15 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-//import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.yenrof.onsite.dto.CompanyDTO;
 import com.yenrof.onsite.dto.PersonDTO;
 import com.yenrof.onsite.dto.ProjectDTO;
-import com.yenrof.onsite.model.Project;
+import com.yenrof.onsite.request.AddPersonRequest;
+import com.yenrof.onsite.request.AddPersonToProjectRequest;
+import com.yenrof.onsite.request.AddProjectRequest;
 
 /**
  * JAX-RS Example
@@ -34,8 +33,7 @@ import com.yenrof.onsite.model.Project;
 @Path("/onsite")
 @RequestScoped
 @Stateful
-public class ProjectService  extends Service {
-
+public class ProjectService extends Service {
 
 	@GET
 	@Path("/getProjects")
@@ -50,7 +48,7 @@ public class ProjectService  extends Service {
 	public List<CompanyDTO> listAllCompanies() {
 		return repository.findAllCompaniesOrderedByName();
 	}
-	
+
 	@GET
 	@Path("/getCompany/{id:[0-9][0-9]*}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -121,29 +119,25 @@ public class ProjectService  extends Service {
 	@Path("/addPerson")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response addPerson(CompanyDTO company) {
+	public Response addPerson(AddPersonRequest addPersonRequest) {
 
 		Response.ResponseBuilder builder = null;
 
 		try {
 			// Validates Person using bean validation
-			PersonDTO person = null;
-			Set<PersonDTO> persons = company.getPersons();
-			if (persons != null) {
-				Iterator<PersonDTO> personItr = persons.iterator();
-				while (personItr.hasNext()) {
-					person = personItr.next();
-					log.info("validating person:" + person.getEmail());
-					// Validates person using bean validation
-					validatePerson(person, false);
-					break; // add one only
-				}
+			PersonDTO person = addPersonRequest.getPerson();
+			if (person != null) {
+				log.info("validating person:" + person.getEmail());
+				// Validates person using bean validation
+				validatePerson(person, false);
 			}
 
-			repository.persist(person, company);
-
+			long id = repository.persist(person,
+					addPersonRequest.getCompanyId());
+			person.setPersonId(id);
 			// Create an "ok" response
-			builder = Response.ok();
+			// builder = Response.ok();
+			builder = Response.ok(person);
 		} catch (ConstraintViolationException ce) {
 			// Handle bean validation issues
 			builder = createViolationResponse(ce.getConstraintViolations());
@@ -181,10 +175,11 @@ public class ProjectService  extends Service {
 			// Validates Project using bean validation
 			validateCompany(company);
 
-			repository.persist(company);
-
+			long companyId = repository.persist(company);
+			company.setCompanyId(companyId);
 			// Create an "ok" response
-			builder = Response.ok();
+			// builder = Response.ok();
+			builder = Response.ok(company);
 		} catch (ConstraintViolationException ce) {
 			// Handle bean validation issues
 			builder = createViolationResponse(ce.getConstraintViolations());
@@ -211,30 +206,23 @@ public class ProjectService  extends Service {
 	 * fields, and related errors.
 	 */
 	@POST
-	@Path("/addProjectToCompany")
+	@Path("/addProject")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response addProjectToCompany(CompanyDTO company) {
+	public Response addProject(AddProjectRequest addProjectRequest) {
 
 		Response.ResponseBuilder builder = null;
 
 		try {
 			// Validates Project using bean validation
-			ProjectDTO project = null;
-			Set<ProjectDTO> projects = company.getProjects();
-			if (projects != null) {
-				Iterator<ProjectDTO> projectItr = projects.iterator();
-				while (projectItr.hasNext()) {
-					project = projectItr.next();
-					log.info("validating project:" + project.getProjectName());
-					validateProject(project, company);
-				}
-			}
-
-			repository.addProject(company);
-
+			ProjectDTO project = addProjectRequest.getProject();
+			log.info("validating project:" + project.getProjectName());
+			validateProject(project, addProjectRequest.getCompanyId());
+			long id = repository.persist(project,
+					addProjectRequest.getCompanyId());
+			project.setProjectId(id);
 			// Create an "ok" response
-			builder = Response.ok();
+			builder = Response.ok(project);
 		} catch (ConstraintViolationException ce) {
 			// Handle bean validation issues
 			builder = createViolationResponse(ce.getConstraintViolations());
@@ -264,25 +252,16 @@ public class ProjectService  extends Service {
 	@Path("/addPersonToProject")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response addPersonToProject(CompanyDTO company) {
+	public Response addPersonToProject(
+			AddPersonToProjectRequest addPersonToProjectRequest) {
 
 		Response.ResponseBuilder builder = null;
 
 		try {
-			// Validates Project using bean validation
-			ProjectDTO project = null;
-			Set<ProjectDTO> projects = company.getProjects();
-			if (projects != null) {
-				Iterator<ProjectDTO> projectItr = projects.iterator();
-				while (projectItr.hasNext()) {
-					project = projectItr.next();
-					log.info("validating project:" + project.getProjectName());
-					validatePersonProject(project, company);
-				}
-			}
-
-			repository.addPersonToProject(company);
-
+			log.info("validating person: "
+					+ addPersonToProjectRequest.getProjectId());
+			validatePersonProject(addPersonToProjectRequest);
+			repository.addPersonToProject(addPersonToProjectRequest);
 			// Create an "ok" response
 			builder = Response.ok();
 		} catch (ConstraintViolationException ce) {
@@ -305,6 +284,5 @@ public class ProjectService  extends Service {
 
 		return builder.build();
 	}
-
 
 }

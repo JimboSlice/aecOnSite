@@ -46,7 +46,7 @@ public class Company implements Serializable {
 
 	// bi-directional many-to-many association to persons with association
 	// table
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinTable(name = "Person_HAS_Company", 
 	joinColumns = { @JoinColumn(name = "companyId", nullable = false, updatable = false) }, 
 	inverseJoinColumns = { @JoinColumn(name = "personId", nullable = false, updatable = false) })
@@ -62,7 +62,7 @@ public class Company implements Serializable {
 
 	// bi-directional many-to-one association to Project
 	@JsonManagedReference("projectref")
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "company")
+	@OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "company")
 	private Set<Project> projects = new LinkedHashSet<Project>(0);
 
 	public Set<Project> getProjects() {
