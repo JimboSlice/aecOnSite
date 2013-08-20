@@ -18,11 +18,15 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.yenrof.onsite.dto.AreaDTO;
+import com.yenrof.onsite.dto.AssetDTO;
 import com.yenrof.onsite.dto.CompanyDTO;
+import com.yenrof.onsite.dto.NoteDTO;
 import com.yenrof.onsite.dto.PersonDTO;
 import com.yenrof.onsite.dto.ProjectDTO;
 import com.yenrof.onsite.dto.ReportDTO;
 import com.yenrof.onsite.request.AddAreaRequest;
+import com.yenrof.onsite.request.AddAssetRequest;
+import com.yenrof.onsite.request.AddNoteRequest;
 import com.yenrof.onsite.request.AddPersonRequest;
 import com.yenrof.onsite.request.AddPersonToProjectRequest;
 import com.yenrof.onsite.request.AddProjectRequest;
@@ -136,8 +140,7 @@ public class ProjectService extends Service {
 				validatePerson(person, false);
 			}
 
-			long id = repository.persist(person,
-					addPersonRequest.getCompanyId());
+			long id = repository.persist(addPersonRequest);
 			person.setPersonId(id);
 			// Create an "ok" response
 			// builder = Response.ok();
@@ -163,7 +166,7 @@ public class ProjectService extends Service {
 	}
 
 	/**
-	 * Creates a new Inspector to a Project from the values provided. Performs
+	 * Creates a new Company from the values provided. Performs
 	 * validation, and will return a JAX-RS response with either 200 ok, or with
 	 * a map of fields, and related errors.
 	 */
@@ -221,9 +224,8 @@ public class ProjectService extends Service {
 			// Validates Project using bean validation
 			ProjectDTO project = addProjectRequest.getProject();
 			log.info("validating project:" + project.getProjectName());
-			validateProject(project, addProjectRequest.getCompanyId());
-			long id = repository.persist(project,
-					addProjectRequest.getCompanyId());
+			validateProject(addProjectRequest);
+			long id = repository.persist(addProjectRequest);
 			project.setProjectId(id);
 			// Create an "ok" response
 			builder = Response.ok(project);
@@ -265,9 +267,8 @@ public class ProjectService extends Service {
 				// Validates Project using bean validation
 				ReportDTO report = addReportRequest.getReport();
 				log.info("validating report:" + report.getRname());
-				validateReport(report, addReportRequest.getProjectId());
-				long id = repository.persist(report,
-						addReportRequest.getProjectId());
+				validateReport(addReportRequest);
+				long id = repository.persist(addReportRequest);
 				report.setReportId(id);
 				// Create an "ok" response
 				builder = Response.ok(report);				
@@ -379,5 +380,91 @@ public class ProjectService extends Service {
 
 		return builder.build();
 	}
+	
+	/**
+	 * Adds a Asset to a Report from the values provided. Performs validation,
+	 * and will return a JAX-RS response with either 200 ok, or with a map of
+	 * fields, and related errors.
+	 */
+	@POST
+	@Path("/addAsset")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response addAsset(AddAssetRequest addAssetRequest) {
+
+		Response.ResponseBuilder builder = null;
+
+		try {
+			// Validates Asset using bean validation
+			AssetDTO asset = addAssetRequest.getAssetDTO();
+			log.info("validating asset:" + asset.getName());
+			validateAsset(addAssetRequest);
+			long id = repository.persist(addAssetRequest);
+			asset.setAssetId(id);
+			// Create an "ok" response
+			builder = Response.ok(asset);
+		} catch (ConstraintViolationException ce) {
+			// Handle bean validation issues
+			builder = createViolationResponse(ce.getConstraintViolations());
+		} catch (ValidationException e) {
+			// Handle the unique constrain violation
+			Map<String, String> responseObj = new HashMap<String, String>();
+			responseObj.put("Asset ", "Asset Name taken");
+			builder = Response.status(Response.Status.CONFLICT).entity(
+					responseObj);
+		} catch (Exception e) {
+			// Handle generic exceptions
+			Map<String, String> responseObj = new HashMap<String, String>();
+			responseObj.put("error", e.getMessage());
+			builder = Response.status(Response.Status.BAD_REQUEST).entity(
+					responseObj);
+		}
+
+		return builder.build();
+	}
+	
+	/**
+	 * Adds a Asset to a Report from the values provided. Performs validation,
+	 * and will return a JAX-RS response with either 200 ok, or with a map of
+	 * fields, and related errors.
+	 */
+	@POST
+	@Path("/addNote")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response addNote(AddNoteRequest addNoteRequest) {
+
+		Response.ResponseBuilder builder = null;
+
+		try {
+			// Validates Asset using bean validation
+			NoteDTO note = addNoteRequest.getNoteDTO();
+			log.info("validating note:" + note.getNote());
+			validateNote(addNoteRequest);
+			long id = repository.persist(addNoteRequest);
+			note.setNoteId(id);
+			// Create an "ok" response
+			builder = Response.ok(note);
+		} catch (ConstraintViolationException ce) {
+			// Handle bean validation issues
+			builder = createViolationResponse(ce.getConstraintViolations());
+		} catch (ValidationException e) {
+			// Handle the unique constrain violation
+			Map<String, String> responseObj = new HashMap<String, String>();
+			responseObj.put("Note note", "Note taken");
+			builder = Response.status(Response.Status.CONFLICT).entity(
+					responseObj);
+		} catch (Exception e) {
+			// Handle generic exceptions
+			Map<String, String> responseObj = new HashMap<String, String>();
+			responseObj.put("error", e.getMessage());
+			builder = Response.status(Response.Status.BAD_REQUEST).entity(
+					responseObj);
+		}
+
+		return builder.build();
+	}
+
+
 
 }

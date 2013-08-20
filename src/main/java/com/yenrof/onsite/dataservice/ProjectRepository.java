@@ -31,7 +31,12 @@ import com.yenrof.onsite.dto.ProjectDTO;
 import com.yenrof.onsite.dto.ReportDTO;
 import com.yenrof.onsite.model.*;
 import com.yenrof.onsite.request.AddAreaRequest;
+import com.yenrof.onsite.request.AddAssetRequest;
+import com.yenrof.onsite.request.AddNoteRequest;
+import com.yenrof.onsite.request.AddPersonRequest;
 import com.yenrof.onsite.request.AddPersonToProjectRequest;
+import com.yenrof.onsite.request.AddProjectRequest;
+import com.yenrof.onsite.request.AddReportRequest;
 
 @ApplicationScoped
 public class ProjectRepository {
@@ -62,6 +67,9 @@ public class ProjectRepository {
 		return report;		
 	}
 	
+	
+
+	
 	public Person_HAS_Project findPersonProject(long personId, long projectId) {
 		log.info("findPersonProject - personId:" + personId + "projectId: " + projectId);
 		String select = "SELECT * FROM Person_HAS_Project where personId=:personId and projectId=:projectId";
@@ -88,29 +96,29 @@ public class ProjectRepository {
 
 	}
 
-	public Project findByProjectNumber(ProjectDTO project, long companyId) {
-		log.info("findByProjectNumber: projectname " + project.getProjectName());
-		log.info("findByProjectNumber: companyid " + companyId);
+	public Project findByProjectNumber(AddProjectRequest addProjectRequest) {
+		log.info("findByProjectNumber: projectname " + addProjectRequest.getProject().getProjectName());
+		log.info("findByProjectNumber: companyid " + addProjectRequest.getCompanyId());
 
-		String number = project.getProjectNumber();
+		String number = addProjectRequest.getProject().getProjectNumber();
 		String select = "SELECT * FROM Project  INNER JOIN Company ON Company.companyId = "
 				+ "Project.Company_companyId where Project.projectNumber=:number and Company.companyId=:companyId";
 		Query query = em.createNativeQuery(select, Project.class);
 		query.setParameter("number", number);
-		query.setParameter("companyId", companyId);
+		query.setParameter("companyId", addProjectRequest.getCompanyId());
 		return (Project) query.getSingleResult();
 	}
 	
-	public Report findByReportName(ReportDTO report, long projectId) {
-		log.info("findByReportName: reportname " + report.getRname());
-		log.info("findByReportName: projectId " + projectId);
+	public Report findByReportName(AddReportRequest addReportRequest) {
+		log.info("findByReportName: reportname " + addReportRequest.getReport().getRname());
+		log.info("findByReportName: projectId " + addReportRequest.getProjectId());
 
-		String reportName = report.getRname();
+		String reportName = addReportRequest.getReport().getRname();
 		String select = "SELECT * FROM Report INNER JOIN Project ON Project.projectId = "
 				+ "Report.Project_projectId where Report.rname=:reportName and Project.projectId=:projectId";
 		Query query = em.createNativeQuery(select, Report.class);
 		query.setParameter("reportName", reportName);
-		query.setParameter("projectId", projectId);
+		query.setParameter("projectId", addReportRequest.getProjectId());
 		return (Report) query.getSingleResult();
 	}
 
@@ -124,6 +132,31 @@ public class ProjectRepository {
 		query.setParameter("areaName", addAreaRequest.getArea().getName());
 		query.setParameter("reportId", addAreaRequest.getReportId());
 		return (Area) query.getSingleResult();
+	}
+	
+	public Asset findByAssetName(AddAssetRequest addAssetRequest) {
+		log.info("findByAssetName: assetname " + addAssetRequest.getAssetDTO().getName());
+		log.info("findByAssetName: areaid " + addAssetRequest.getAreaId());
+
+		String select = "SELECT * FROM Asset INNER JOIN Area ON Area.areaId = "
+				+ "Asset.Area_areaId where Asset.name=:assetName and Area.areaId=:areaId";
+		Query query = em.createNativeQuery(select, Asset.class);
+		query.setParameter("assetName", addAssetRequest.getAssetDTO().getName());
+		query.setParameter("areaId", addAssetRequest.getAreaId());
+		return (Asset) query.getSingleResult();
+	}
+
+	
+	public Note findByNoteName(AddNoteRequest addNoteRequest) {
+		log.info("findByNoteName: notename " + addNoteRequest.getNoteDTO().getNote());
+		log.info("findByNoteName: areaid " + addNoteRequest.getAreaId());
+
+		String select = "SELECT * FROM Note INNER JOIN Area ON Area.areaId = "
+				+ "Note.Area_areaId where Note.note=:note and Area.areaId=:areaId";
+		Query query = em.createNativeQuery(select, Note.class);
+		query.setParameter("note", addNoteRequest.getNoteDTO().getNote());
+		query.setParameter("areaId", addNoteRequest.getAreaId());
+		return (Note) query.getSingleResult();
 	}
 
 	public Person findByUserName(String email) {
@@ -262,29 +295,53 @@ public class ProjectRepository {
 		}
 	}
 
-	public long persist(ProjectDTO project, long companyId) throws Exception {
-		Company dbCompany = findCompanyById(companyId);
+	public long persist(AddProjectRequest addProjectRequest) throws Exception {
+		Company dbCompany = findCompanyById(addProjectRequest.getCompanyId());
 		log.info("Persisting projects for" + dbCompany.getName());
-		log.info("project:" + project.getProjectName());
+		log.info("project:" + addProjectRequest.getProject().getProjectName());
 		log.info("companyId:" + dbCompany.getCompanyId());
-		Project dbProject = (Project) map(project); // convert to entity
+		Project dbProject = (Project) map(addProjectRequest.getProject()); // convert to entity
 		dbProject.setCompany(dbCompany);
 		em.persist(dbProject);
-		Project dbProject2 = findByProjectNumber(project, companyId);
+		Project dbProject2 = findByProjectNumber(addProjectRequest);
 		return dbProject2.getProjectId();
 	}
 	
-	public long persist(ReportDTO report, long projectId) throws Exception {
-		Project dbProject = findProjectById(projectId);
-		log.info("projectId: " + projectId);
+	public long persist(AddAssetRequest addAssetRequest) throws Exception {
+		Area dbArea = findAreaById(addAssetRequest.getAreaId());
+		log.info("areaId: " + addAssetRequest.getAreaId());
+		log.info("asset:" + addAssetRequest.getAssetDTO().getName());
+		Asset dbAsset = (Asset) map(addAssetRequest.getAssetDTO()); // convert to entity
+		dbAsset.setArea(dbArea);
+		em.persist(dbAsset);
+		Asset dbAsset2 = findByAssetName(addAssetRequest);
+		return dbAsset2.getAssetId();
+	}
+	
+	public long persist(AddNoteRequest addNoteRequest) throws Exception {
+		Area dbArea = findAreaById(addNoteRequest.getAreaId());
+		log.info("areaId: " + addNoteRequest.getAreaId());
+		log.info("note:" + addNoteRequest.getNoteDTO().getNote());
+		Note dbNote = (Note) map(addNoteRequest.getNoteDTO()); // convert to entity
+		dbNote.setArea(dbArea);
+		em.persist(dbNote);
+		Note dbNote2 = findByNoteName(addNoteRequest);
+		return dbNote2.getNoteId();
+	}
+
+	
+	public long persist(AddReportRequest addReportRequest) throws Exception {
+		Project dbProject = findProjectById(addReportRequest.getProjectId());
+		log.info("projectId: " + addReportRequest.getProjectId());
 		log.info("Persisting report for project " + dbProject.getProjectName());
-		log.info("report:" + report.getRname());
-		Report dbReport = (Report) map(report); // convert to entity
+		log.info("report:" + addReportRequest.getReport().getRname());
+		Report dbReport = (Report) map(addReportRequest.getReport()); // convert to entity
 		dbReport.setProject(dbProject);
 		em.persist(dbReport);
-		Report dbReport2 = findByReportName(report, projectId);
+		Report dbReport2 = findByReportName(addReportRequest);
 		return dbReport2.getReportId();
 	}
+
 	
 	public long persist(AddAreaRequest addAreaRequest) throws Exception {
 		Report dbReport = findReportById(addAreaRequest.getReportId());
@@ -377,9 +434,10 @@ public class ProjectRepository {
 
 	}
 
-	public long persist(PersonDTO person, long companyId) throws Exception {
+	public long persist(AddPersonRequest addPersonRequest) throws Exception {
+		PersonDTO person=addPersonRequest.getPerson();
 		log.info("Persisting " + person.getEmail());
-		Company dbCompany = findCompanyById(companyId);
+		Company dbCompany = findCompanyById(addPersonRequest.getCompanyId());
 		Person dbPerson = null;
 		try {
 			dbPerson = findByUserName(person.getEmail());

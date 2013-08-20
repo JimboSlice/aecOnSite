@@ -15,16 +15,24 @@ import javax.validation.Validator;
 import javax.ws.rs.core.Response;
 
 import com.yenrof.onsite.request.AddAreaRequest;
+import com.yenrof.onsite.request.AddAssetRequest;
+import com.yenrof.onsite.request.AddNoteRequest;
 import com.yenrof.onsite.request.AddPersonToProjectRequest;
+import com.yenrof.onsite.request.AddProjectRequest;
+import com.yenrof.onsite.request.AddReportRequest;
 import com.yenrof.onsite.dataservice.ProjectRepository;
 import com.yenrof.onsite.dto.AreaDTO;
+import com.yenrof.onsite.dto.AssetDTO;
 import com.yenrof.onsite.dto.CompanyDTO;
+import com.yenrof.onsite.dto.NoteDTO;
 import com.yenrof.onsite.dto.OnsiteKeyDTO;
 import com.yenrof.onsite.dto.PersonDTO;
 import com.yenrof.onsite.dto.ProjectDTO;
 import com.yenrof.onsite.dto.ReportDTO;
 import com.yenrof.onsite.model.Area;
+import com.yenrof.onsite.model.Asset;
 import com.yenrof.onsite.model.Company;
+import com.yenrof.onsite.model.Note;
 import com.yenrof.onsite.model.Person;
 import com.yenrof.onsite.model.Person_HAS_Project;
 import com.yenrof.onsite.model.Project;
@@ -173,6 +181,96 @@ public class Service {
 		}
 
 	}
+	
+	/**
+	 * <p>
+	 * Validates the given Asset variable and throws validation exceptions
+	 * based on the type of error. If the error is standard bean validation
+	 * errors then it will throw a ConstraintValidationException with the set of
+	 * the constraints violated.
+	 * </p>
+	 * <p>
+	 * If the error is caused because an existing Asset with the same name
+	 * is already associated with the area it throws a regular validation
+	 * exception so that it can be interpreted separately.
+	 * </p>
+	 * 
+	 * @param AddAssetRequest
+	 *            Asset with of Area to be validated
+	 * @throws ConstraintViolationException
+	 *             If Bean Validation errors exist
+	 * @throws ValidationException
+	 *             If Inspector with the same already exists
+	 */
+	protected void validateAsset(
+			AddAssetRequest addAssetRequest)
+			throws ConstraintViolationException, ValidationException {
+		log.fine("validateAsset started: "
+				+ addAssetRequest.getAreaId());
+		// Create a bean validator and check for issues.
+		Set<ConstraintViolation<AssetDTO>> violations = validator
+				.validate(addAssetRequest.getAssetDTO());
+
+		if (!violations.isEmpty()) {
+			throw new ConstraintViolationException(
+					new HashSet<ConstraintViolation<?>>(violations));
+		}
+		// Check the uniqueness of the name
+		if (assetExists(addAssetRequest)) {
+			log.info("Asset Area Relationship Already Exists  violation: "
+					+ addAssetRequest.getPersonId()
+					+ addAssetRequest.getAssetDTO().getDescription());
+			throw new ValidationException(
+					"Asset Area Already Exists  Violation");
+		}
+
+	}
+	
+	/**
+	 * <p>
+	 * Validates the given Asset variable and throws validation exceptions
+	 * based on the type of error. If the error is standard bean validation
+	 * errors then it will throw a ConstraintValidationException with the set of
+	 * the constraints violated.
+	 * </p>
+	 * <p>
+	 * If the error is caused because an existing Asset with the same name
+	 * is already associated with the area it throws a regular validation
+	 * exception so that it can be interpreted separately.
+	 * </p>
+	 * 
+	 * @param AddAssetRequest
+	 *            Asset with of Area to be validated
+	 * @throws ConstraintViolationException
+	 *             If Bean Validation errors exist
+	 * @throws ValidationException
+	 *             If Inspector with the same already exists
+	 */
+	protected void validateNote(
+			AddNoteRequest addNoteRequest)
+			throws ConstraintViolationException, ValidationException {
+		log.fine("validateAsset started: "
+				+ addNoteRequest.getAreaId());
+		// Create a bean validator and check for issues.
+		Set<ConstraintViolation<NoteDTO>> violations = validator
+				.validate(addNoteRequest.getNoteDTO());
+
+		if (!violations.isEmpty()) {
+			throw new ConstraintViolationException(
+					new HashSet<ConstraintViolation<?>>(violations));
+		}
+		// Check the uniqueness of the note name
+		if (noteExists(addNoteRequest)) {
+			log.info("Area Note Relationship Already Exists  violation: "
+					+ addNoteRequest.getAreaId()
+					+ addNoteRequest.getNoteDTO().getNote());
+			throw new ValidationException(
+					"Area Note Already Exists  Violation");
+		}
+
+	}
+
+
 
 	/**
 	 * <p>
@@ -194,21 +292,21 @@ public class Service {
 	 * @throws ValidationException
 	 *             If Report with the same name already exists
 	 */
-	protected void validateReport(ReportDTO report, long projectId)
+	protected void validateReport(AddReportRequest addReportRequest)
 			throws ConstraintViolationException, ValidationException {
-		log.fine("validateReport started for project : " + projectId);
+		log.fine("validateReport started for project : " + addReportRequest.getProjectId());
 		// Create a bean validator and check for issues.
 		Set<ConstraintViolation<ReportDTO>> violations = validator
-				.validate(report);
+				.validate(addReportRequest.getReport());
 
 		if (!violations.isEmpty()) {
 			throw new ConstraintViolationException(
 					new HashSet<ConstraintViolation<?>>(violations));
 		}
 		// Check the uniqueness of the name
-		if (personReportAlreadyExists(report, projectId)) {
+		if (personReportAlreadyExists(addReportRequest)) {
 			log.info("Report-Project Relationship Already Exists  violation: "
-					+ report.getReportId() + " " + projectId);
+					+ addReportRequest.getReport().getReportId() + " " + addReportRequest.getProjectId());
 			throw new ValidationException(
 					"Person Project Already Exists  Violation");
 		}
@@ -356,12 +454,12 @@ public class Service {
 	 * @throws ValidationException
 	 *             If Project with the same number already exists
 	 */
-	protected void validateProject(ProjectDTO project, long companyId)
+	protected void validateProject(AddProjectRequest addProjectRequest)
 			throws ConstraintViolationException, ValidationException {
-		log.fine("Validate project started: " + project.getProjectName());
+		log.fine("Validate project started: " + addProjectRequest.getProject().getProjectName());
 		// Create a bean validator and check for issues.
 		Set<ConstraintViolation<ProjectDTO>> violations = validator
-				.validate(project);
+				.validate(addProjectRequest.getProject());
 
 		if (!violations.isEmpty()) {
 			throw new ConstraintViolationException(
@@ -369,9 +467,9 @@ public class Service {
 		}
 
 		// Check the uniqueness of the name
-		if (projectNumberAlreadyExists(project, companyId)) {
-			log.info("Project Number  violation: " + project.getProjectName()
-					+ " " + project.getProjectNumber());
+		if (projectNumberAlreadyExists(addProjectRequest)) {
+			log.info("Project Number  violation: " + addProjectRequest.getProject().getProjectName()
+					+ " " + addProjectRequest.getProject().getProjectNumber());
 			throw new ValidationException("Unique Project Number Violation");
 		}
 	}
@@ -410,11 +508,10 @@ public class Service {
 	 *            The projectNumber to check
 	 * @return True if the projectNumber already exists, and false otherwise
 	 */
-	protected boolean projectNumberAlreadyExists(ProjectDTO project,
-			long companyId) {
+	protected boolean projectNumberAlreadyExists(AddProjectRequest addProjectRequest) {
 		Project projectdb = null;
 		try {
-			projectdb = repository.findByProjectNumber(project, companyId);
+			projectdb = repository.findByProjectNumber(addProjectRequest);
 		} catch (NoResultException e) {
 			// ignore
 		}
@@ -432,10 +529,10 @@ public class Service {
 	 *            the report check
 	 * @return True if the reportName already exists, and false otherwise
 	 */
-	protected boolean personReportAlreadyExists(ReportDTO report, long projectId) {
+	protected boolean personReportAlreadyExists(AddReportRequest addReportRequest) {
 		Report reportdb = null;
 		try {
-			reportdb = repository.findByReportName(report, projectId);
+			reportdb = repository.findByReportName(addReportRequest);
 		} catch (NoResultException e) {
 			// ignore
 		}
@@ -522,6 +619,44 @@ public class Service {
 			// ignore
 		}
 		return personProject != null;
+	}
+	
+	/**
+	 * Checks if a note is attached to a area
+	 * 
+	 * @param AddNoteRequest
+	 *            The note to check
+	 * @return True if the person/project matches and false otherwise
+	 */
+
+	protected boolean noteExists(AddNoteRequest addNoteRequest) {
+		Note note = null;
+		try {
+			note = repository.findByNoteName(addNoteRequest);
+		} catch (NoResultException e) {
+			// ignore
+		}
+		return note != null;
+
+	}
+
+	/**
+	 * Checks if a asset is attached to a area
+	 * 
+	 * @param AddAssetRequest
+	 *            The asset to check
+	 * @return True if the person/project matches and false otherwise
+	 */
+
+	protected boolean assetExists(AddAssetRequest addAssetRequest) {
+		Asset asset = null;
+		try {
+			asset = repository.findByAssetName(addAssetRequest);
+		} catch (NoResultException e) {
+			// ignore
+		}
+		return asset != null;
+
 	}
 
 	/**

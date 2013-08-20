@@ -1,0 +1,11 @@
+{ "personId":"01",
+  "projectId":"01",
+  "reportId":"02",
+  "area":{
+                    	"comment": "comment1",
+                        "name": "name1",
+                        "number": "number1"
+           } 
+}
+ 
+ http://www.yenrof.com/rest/onsite/addArea

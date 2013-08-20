@@ -1,8 +1,7 @@
 { "companyId":"01",
   "project":"01",
      "person": {
-     "username": "xxxxxx111",
-     "email": "email99",
+      "email": "xxxxx@fffff.com",
      "subscriptionType": "subscriptionType",
      "password": "password0909"
      }      

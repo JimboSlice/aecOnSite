@@ -1,0 +1,11 @@
+{ "personId":"01",
+  "projectId":"01",
+ "report":{
+                    "rtype":"M",
+                    "rname":"report1",
+   					"peopleOnSite": 23,
+   					"constructionphase": "starting"
+           } 
+}
+ 
+ http://www.yenrof.com/rest/onsite/addReport
