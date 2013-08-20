@@ -30,6 +30,7 @@ import com.yenrof.onsite.dto.PersonDTO;
 import com.yenrof.onsite.dto.ProjectDTO;
 import com.yenrof.onsite.dto.ReportDTO;
 import com.yenrof.onsite.model.*;
+import com.yenrof.onsite.request.AddAreaRequest;
 import com.yenrof.onsite.request.AddPersonToProjectRequest;
 
 @ApplicationScoped
@@ -41,7 +42,7 @@ public class ProjectRepository {
 	@Inject
 	private Logger log;
 
-	public Project findById(long id) {
+	public Project findProjectById(long id) {
 		Project project = em.find(Project.class, id);
 		return project;
 	}
@@ -49,6 +50,26 @@ public class ProjectRepository {
 	public Company findCompanyById(long id) {
 		Company company = em.find(Company.class, id);
 		return company;
+	}
+	
+	public Area findAreaById(long id) {
+		Area area = em.find(Area.class, id);
+		return area;		
+	}
+	
+	public Report findReportById(long id) {
+		Report report = em.find(Report.class, id);
+		return report;		
+	}
+	
+	public Person_HAS_Project findPersonProject(long personId, long projectId) {
+		log.info("findPersonProject - personId:" + personId + "projectId: " + projectId);
+		String select = "SELECT * FROM Person_HAS_Project where personId=:personId and projectId=:projectId";
+		Query query = em.createNativeQuery(select, Person_HAS_Project.class);
+		query.setParameter("personId", personId);
+		query.setParameter("projectId",	projectId);
+		return (Person_HAS_Project) query.getSingleResult();
+
 	}
 
 	public Person_HAS_Project findPersonProject(
@@ -68,10 +89,8 @@ public class ProjectRepository {
 	}
 
 	public Project findByProjectNumber(ProjectDTO project, long companyId) {
-		Company dbCompany = findCompanyById(companyId);
 		log.info("findByProjectNumber: projectname " + project.getProjectName());
-		log.info("findByProjectNumber: companyname " + dbCompany.getName());
-		log.info("findByProjectNumber: companyid " + dbCompany.getCompanyId());
+		log.info("findByProjectNumber: companyid " + companyId);
 
 		String number = project.getProjectNumber();
 		String select = "SELECT * FROM Project  INNER JOIN Company ON Company.companyId = "
@@ -80,6 +99,31 @@ public class ProjectRepository {
 		query.setParameter("number", number);
 		query.setParameter("companyId", companyId);
 		return (Project) query.getSingleResult();
+	}
+	
+	public Report findByReportName(ReportDTO report, long projectId) {
+		log.info("findByReportName: reportname " + report.getRname());
+		log.info("findByReportName: projectId " + projectId);
+
+		String reportName = report.getRname();
+		String select = "SELECT * FROM Report INNER JOIN Project ON Project.projectId = "
+				+ "Report.Project_projectId where Report.rname=:reportName and Project.projectId=:projectId";
+		Query query = em.createNativeQuery(select, Report.class);
+		query.setParameter("reportName", reportName);
+		query.setParameter("projectId", projectId);
+		return (Report) query.getSingleResult();
+	}
+
+	public Area findByAreaName(AddAreaRequest addAreaRequest) {
+		log.info("findByAreaName: areaname " + addAreaRequest.getArea().getName());
+		log.info("findByAreaName: reportId " + addAreaRequest.getReportId());
+
+		String select = "SELECT * FROM Area INNER JOIN Report ON Report.reportId = "
+				+ "Area.Report_reportId where Area.name=:areaName and Report.reportId=:reportId";
+		Query query = em.createNativeQuery(select, Area.class);
+		query.setParameter("areaName", addAreaRequest.getArea().getName());
+		query.setParameter("reportId", addAreaRequest.getReportId());
+		return (Area) query.getSingleResult();
 	}
 
 	public Person findByUserName(String email) {
@@ -128,7 +172,18 @@ public class ProjectRepository {
 
 	public List<ProjectDTO> findAllOrderedByName() {
 		String select = "select * from Project order by projectName";
-		return (List<ProjectDTO>) em.createNativeQuery(select).getResultList();
+		List<Project> result= em.createNativeQuery(select).getResultList();
+		List<ProjectDTO> returnList = new ArrayList<ProjectDTO>();
+		Project project=null;
+		if (result != null) {
+			Iterator<Project> projectItr = result.iterator();
+			while (projectItr.hasNext()) {
+				project = (Project) projectItr.next();
+				returnList.add((ProjectDTO) map(project));
+			}
+		}
+		return returnList;
+
 	}
 
 	public List<CompanyDTO> findAllCompaniesOrderedByName() {
@@ -152,7 +207,17 @@ public class ProjectRepository {
 		String select = "SELECT * FROM Project INNER JOIN Company ON Company.companyId = Project.Company_companyId where Company.companyId=:companyId";
 		Query query = em.createNativeQuery(select, Project.class);
 		query.setParameter("companyId", companyId);
-		return (List<ProjectDTO>) query.getResultList();
+		List<Project> result =query.getResultList();
+		List<ProjectDTO> returnList = new ArrayList<ProjectDTO>();
+		Project project=null;
+		if (result != null) {
+			Iterator<Project> projectItr = result.iterator();
+			while (projectItr.hasNext()) {
+				project = (Project) projectItr.next();
+				returnList.add((ProjectDTO) map(project));
+			}
+		}
+		return returnList;
 	}
 
 	public List<ProjectDTO> findAllPersonProjectsOrderedByName(long personId) {
@@ -191,7 +256,7 @@ public class ProjectRepository {
 			em.persist(php);
 		} catch (NoResultException e) {
 		    dbPerson = (Person) map(person); // convert to entity
-		    Project dbProject = this.findById(addPersonToProjectRequest.getProjectId());
+		    Project dbProject = this.findProjectById(addPersonToProjectRequest.getProjectId());
 		    dbProject.addPerson(dbPerson);
 			em.persist(dbProject);
 		}
@@ -208,6 +273,31 @@ public class ProjectRepository {
 		Project dbProject2 = findByProjectNumber(project, companyId);
 		return dbProject2.getProjectId();
 	}
+	
+	public long persist(ReportDTO report, long projectId) throws Exception {
+		Project dbProject = findProjectById(projectId);
+		log.info("projectId: " + projectId);
+		log.info("Persisting report for project " + dbProject.getProjectName());
+		log.info("report:" + report.getRname());
+		Report dbReport = (Report) map(report); // convert to entity
+		dbReport.setProject(dbProject);
+		em.persist(dbReport);
+		Report dbReport2 = findByReportName(report, projectId);
+		return dbReport2.getReportId();
+	}
+	
+	public long persist(AddAreaRequest addAreaRequest) throws Exception {
+		Report dbReport = findReportById(addAreaRequest.getReportId());
+		log.info("Persisting area for report " + dbReport.getRname());
+		log.info("area:" + addAreaRequest.getArea().getName());
+		log.info("reportId:" + addAreaRequest.getReportId());
+		Area dbArea = (Area) map(addAreaRequest.getArea()); // convert to entity
+		dbArea.setReport(dbReport);
+		em.persist(dbArea);
+		Area dbArea2 = findByAreaName(addAreaRequest);
+		return dbArea2.getAreaId();
+	}
+
 
 	// public void persist(Project project) throws Exception {
 	public void persistAll(CompanyDTO company) throws Exception {

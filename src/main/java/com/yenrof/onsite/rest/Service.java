@@ -14,21 +14,26 @@ import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.ws.rs.core.Response;
 
+import com.yenrof.onsite.request.AddAreaRequest;
 import com.yenrof.onsite.request.AddPersonToProjectRequest;
 import com.yenrof.onsite.dataservice.ProjectRepository;
+import com.yenrof.onsite.dto.AreaDTO;
 import com.yenrof.onsite.dto.CompanyDTO;
 import com.yenrof.onsite.dto.OnsiteKeyDTO;
 import com.yenrof.onsite.dto.PersonDTO;
 import com.yenrof.onsite.dto.ProjectDTO;
+import com.yenrof.onsite.dto.ReportDTO;
+import com.yenrof.onsite.model.Area;
 import com.yenrof.onsite.model.Company;
 import com.yenrof.onsite.model.Person;
 import com.yenrof.onsite.model.Person_HAS_Project;
 import com.yenrof.onsite.model.Project;
+import com.yenrof.onsite.model.Report;
 import com.yenrof.onsite.model.UserCredential;
 import com.yenrof.onsite.service.ProjectRegistration;
 
 public class Service {
-	
+
 	@Inject
 	protected Logger log;
 
@@ -40,17 +45,17 @@ public class Service {
 
 	@Inject
 	ProjectRegistration registration;
-	
-		/**
+
+	/**
 	 * <p>
-	 * Validates the given UserCredential variable and throws validation exceptions
-	 * based on the type of error. If the error is standard bean validation
-	 * errors then it will throw a ConstraintValidationException with the set of
-	 * the constraints violated.
+	 * Validates the given UserCredential variable and throws validation
+	 * exceptions based on the type of error. If the error is standard bean
+	 * validation errors then it will throw a ConstraintValidationException with
+	 * the set of the constraints violated.
 	 * </p>
 	 * <p>
-	 * If the error is caused because an existing UserCredential matches database
-	 * it throws a regular validation exception so that it can be
+	 * If the error is caused because an existing UserCredential matches
+	 * database it throws a regular validation exception so that it can be
 	 * interpreted separately.
 	 * </p>
 	 * 
@@ -63,8 +68,9 @@ public class Service {
 	 */
 	protected OnsiteKeyDTO validateUserCredentials(UserCredential userCredential)
 			throws ConstraintViolationException, ValidationException {
-		log.fine("validateUserCredentials started: " + userCredential.getUserName());
-		OnsiteKeyDTO person=null;
+		log.fine("validateUserCredentials started: "
+				+ userCredential.getUserName());
+		OnsiteKeyDTO person = null;
 		// Create a bean validator and check for issues.
 		Set<ConstraintViolation<UserCredential>> violations = validator
 				.validate(userCredential);
@@ -75,14 +81,15 @@ public class Service {
 		}
 
 		// Check the id/password
-		person=credentialsMatch(userCredential);
-		if (person==null) {
-			log.info("Id and Password match violation: " + userCredential.getUserName());
+		person = credentialsMatch(userCredential);
+		if (person == null) {
+			log.info("Id and Password match violation: "
+					+ userCredential.getUserName());
 			throw new ValidationException("Id and Password Violation");
 		}
 		return person;
 	}
-	
+
 	/**
 	 * <p>
 	 * Validates the given Company variable and throws validation exceptions
@@ -143,9 +150,11 @@ public class Service {
 	 * @throws ValidationException
 	 *             If Inspector with the same already exists
 	 */
-	protected void validatePersonProject(AddPersonToProjectRequest addPersonToProjectRequest)
+	protected void validatePersonProject(
+			AddPersonToProjectRequest addPersonToProjectRequest)
 			throws ConstraintViolationException, ValidationException {
-		log.fine("validatePersonProject started: " + addPersonToProjectRequest.getProjectId());
+		log.fine("validatePersonProject started: "
+				+ addPersonToProjectRequest.getProjectId());
 		// Create a bean validator and check for issues.
 		Set<ConstraintViolation<PersonDTO>> violations = validator
 				.validate(addPersonToProjectRequest.getPerson());
@@ -157,9 +166,94 @@ public class Service {
 		// Check the uniqueness of the name
 		if (personProjectAlreadyExists(addPersonToProjectRequest)) {
 			log.info("Person Project Relationship Already Exists  violation: "
-					+ addPersonToProjectRequest.getProjectId() + addPersonToProjectRequest.getPerson().getPersonId());
+					+ addPersonToProjectRequest.getProjectId()
+					+ addPersonToProjectRequest.getPerson().getPersonId());
 			throw new ValidationException(
 					"Person Project Already Exists  Violation");
+		}
+
+	}
+
+	/**
+	 * <p>
+	 * Validates the given Person variable and throws validation exceptions
+	 * based on the type of error. If the error is standard bean validation
+	 * errors then it will throw a ConstraintValidationException with the set of
+	 * the constraints violated.
+	 * </p>
+	 * <p>
+	 * If the error is caused because an existing Person with the same username
+	 * is already associated with the project it throws a regular validation
+	 * exception so that it can be interpreted separately.
+	 * </p>
+	 * 
+	 * @param AddReportRequest
+	 *            Report with Project id to be validated
+	 * @throws ConstraintViolationException
+	 *             If Bean Validation errors exist
+	 * @throws ValidationException
+	 *             If Report with the same name already exists
+	 */
+	protected void validateReport(ReportDTO report, long projectId)
+			throws ConstraintViolationException, ValidationException {
+		log.fine("validateReport started for project : " + projectId);
+		// Create a bean validator and check for issues.
+		Set<ConstraintViolation<ReportDTO>> violations = validator
+				.validate(report);
+
+		if (!violations.isEmpty()) {
+			throw new ConstraintViolationException(
+					new HashSet<ConstraintViolation<?>>(violations));
+		}
+		// Check the uniqueness of the name
+		if (personReportAlreadyExists(report, projectId)) {
+			log.info("Report-Project Relationship Already Exists  violation: "
+					+ report.getReportId() + " " + projectId);
+			throw new ValidationException(
+					"Person Project Already Exists  Violation");
+		}
+
+	}
+
+	/**
+	 * <p>
+	 * Validates the given Person variable and throws validation exceptions
+	 * based on the type of error. If the error is standard bean validation
+	 * errors then it will throw a ConstraintValidationException with the set of
+	 * the constraints violated.
+	 * </p>
+	 * <p>
+	 * If the error is caused because an existing Area with the same name is
+	 * already associated with the project it throws a regular validation
+	 * exception so that it can be interpreted separately.
+	 * </p>
+	 * 
+	 * @param AddAreaRequest
+	 *            Area with Project id to be validated
+	 * @throws ConstraintViolationException
+	 *             If Bean Validation errors exist
+	 * @throws ValidationException
+	 *             If Area with the same name already exists
+	 */
+	protected void validateArea(AddAreaRequest addAreaRequest)
+			throws ConstraintViolationException, ValidationException {
+		log.fine("validateReport started for area : "
+				+ addAreaRequest.getArea().getName());
+		// Create a bean validator and check for issues.
+		Set<ConstraintViolation<AreaDTO>> violations = validator
+				.validate(addAreaRequest.getArea());
+
+		if (!violations.isEmpty()) {
+			throw new ConstraintViolationException(
+					new HashSet<ConstraintViolation<?>>(violations));
+		}
+		// Check the uniqueness of the name
+		if (reportAreaAlreadyExists(addAreaRequest)) {
+			log.info("Report-Area Relationship Already Exists  violation: "
+					+ addAreaRequest.getReportId() + " "
+					+ addAreaRequest.getProjectId());
+			throw new ValidationException(
+					"Report Area Already Exists  Violation");
 		}
 
 	}
@@ -172,9 +266,9 @@ public class Service {
 	 * the constraints violated.
 	 * </p>
 	 * <p>
-	 * If the error is caused because an existing Inspector with the same
-	 * username is registered it throws a regular validation exception so that
-	 * it can be interpreted separately.
+	 * If the error is caused because an existing Person with the same username
+	 * is registered it throws a regular validation exception so that it can be
+	 * interpreted separately.
 	 * </p>
 	 * 
 	 * @param PersonDTO
@@ -202,6 +296,7 @@ public class Service {
 		}
 
 	}
+
 	/**
 	 * <p>
 	 * Validates the given Inspector variable and throws validation exceptions
@@ -210,9 +305,9 @@ public class Service {
 	 * the constraints violated.
 	 * </p>
 	 * <p>
-	 * If the error is caused because an existing Inspector with the same
-	 * username is registered it throws a regular validation exception so that
-	 * it can be interpreted separately.
+	 * If the error is caused because an existing Person with the same username
+	 * is registered it throws a regular validation exception so that it can be
+	 * interpreted separately.
 	 * </p>
 	 * 
 	 * @param PersonDTO
@@ -315,7 +410,8 @@ public class Service {
 	 *            The projectNumber to check
 	 * @return True if the projectNumber already exists, and false otherwise
 	 */
-	protected boolean projectNumberAlreadyExists(ProjectDTO project, long companyId) {
+	protected boolean projectNumberAlreadyExists(ProjectDTO project,
+			long companyId) {
 		Project projectdb = null;
 		try {
 			projectdb = repository.findByProjectNumber(project, companyId);
@@ -326,8 +422,49 @@ public class Service {
 	}
 
 	/**
-	 * Checks if a Person with the same username is already registered. This
+	 * Checks if a Report with the same reportName is already registered. This
 	 * is the only way to easily capture the
+	 * "@UniqueConstraint(columnNames = "reportName")" constraint from the
+	 * Report class.
+	 * 
+	 * @param ReportDTO
+	 *            The reportName to check * @param ReportDTO The projectId to of
+	 *            the report check
+	 * @return True if the reportName already exists, and false otherwise
+	 */
+	protected boolean personReportAlreadyExists(ReportDTO report, long projectId) {
+		Report reportdb = null;
+		try {
+			reportdb = repository.findByReportName(report, projectId);
+		} catch (NoResultException e) {
+			// ignore
+		}
+		return reportdb != null;
+	}
+
+	/**
+	 * Checks if a Area with the same name is already registered. This is the
+	 * only way to easily capture the
+	 * "@UniqueConstraint(columnNames = "reportName")" constraint from the
+	 * Report class.
+	 * 
+	 * @param AddAreaRequest
+	 *            The name to check
+	 * @return True if the area name already exists, and false otherwise
+	 */
+	protected boolean reportAreaAlreadyExists(AddAreaRequest addAreaRequest) {
+		Area areadb = null;
+		try {
+			areadb = repository.findByAreaName(addAreaRequest);
+		} catch (NoResultException e) {
+			// ignore
+		}
+		return areadb != null;
+	}
+
+	/**
+	 * Checks if a Person with the same username is already registered. This is
+	 * the only way to easily capture the
 	 * "@UniqueConstraint(columnNames = "username")" constraint from the Project
 	 * class.
 	 * 
@@ -375,10 +512,12 @@ public class Service {
 	 * @return True if the person already exists on the project, and false
 	 *         otherwise
 	 */
-	protected boolean personProjectAlreadyExists(AddPersonToProjectRequest addPersonToProjectRequest) {
+	protected boolean personProjectAlreadyExists(
+			AddPersonToProjectRequest addPersonToProjectRequest) {
 		Person_HAS_Project personProject = null;
 		try {
-			personProject = repository.findPersonProject( addPersonToProjectRequest);
+			personProject = repository
+					.findPersonProject(addPersonToProjectRequest);
 		} catch (NoResultException e) {
 			// ignore
 		}
@@ -386,14 +525,13 @@ public class Service {
 	}
 
 	/**
-	 * Checks if a UserCredential matches database 
-	 * 	 * "@UniqueConstraint(columnNames = "name")" constraint from the Person
-	 * class.
-	 * validateUserCredentials
+	 * Checks if a UserCredential matches database *
+	 * "@UniqueConstraint(columnNames = "name")" constraint from the Person
+	 * class. validateUserCredentials
+	 * 
 	 * @param userCredential
 	 *            The name to check
-	 * @return True if the userCredential matches and false
-	 *         otherwise
+	 * @return True if the userCredential matches and false otherwise
 	 */
 	protected OnsiteKeyDTO credentialsMatch(UserCredential userCredential) {
 		OnsiteKeyDTO personKey = null;
@@ -405,7 +543,24 @@ public class Service {
 		return personKey;
 	}
 
+	/**
+	 * Checks if a person is attached to a project
+	 * 
+	 * @param personId
+	 * @param projectId
+	 *            The person to check
+	 * @return True if the person/project matches and false otherwise
+	 */
+
+	protected boolean validatePerson(long personId, long projectId) {
+		Person_HAS_Project personProject = null;
+		try {
+			personProject = repository.findPersonProject(personId, projectId);
+		} catch (NoResultException e) {
+			// ignore
+		}
+		return personProject != null;
+
+	}
 
 }
-
-

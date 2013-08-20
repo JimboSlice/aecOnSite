@@ -17,12 +17,16 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.yenrof.onsite.dto.AreaDTO;
 import com.yenrof.onsite.dto.CompanyDTO;
 import com.yenrof.onsite.dto.PersonDTO;
 import com.yenrof.onsite.dto.ProjectDTO;
+import com.yenrof.onsite.dto.ReportDTO;
+import com.yenrof.onsite.request.AddAreaRequest;
 import com.yenrof.onsite.request.AddPersonRequest;
 import com.yenrof.onsite.request.AddPersonToProjectRequest;
 import com.yenrof.onsite.request.AddProjectRequest;
+import com.yenrof.onsite.request.AddReportRequest;
 
 /**
  * JAX-RS Example
@@ -242,6 +246,97 @@ public class ProjectService extends Service {
 
 		return builder.build();
 	}
+	
+	/**
+	 * Adds a Project to a Companyfrom the values provided. Performs validation,
+	 * and will return a JAX-RS response with either 200 ok, or with a map of
+	 * fields, and related errors.
+	 */
+	@POST
+	@Path("/addReport")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response addReport(AddReportRequest addReportRequest) {
+
+		Response.ResponseBuilder builder = null;
+
+		try {
+			if (validatePerson(addReportRequest.getPersonId(),addReportRequest.getProjectId())) {
+				// Validates Project using bean validation
+				ReportDTO report = addReportRequest.getReport();
+				log.info("validating report:" + report.getRname());
+				validateReport(report, addReportRequest.getProjectId());
+				long id = repository.persist(report,
+						addReportRequest.getProjectId());
+				report.setReportId(id);
+				// Create an "ok" response
+				builder = Response.ok(report);				
+			}
+		} catch (ConstraintViolationException ce) {
+			// Handle bean validation issues
+			builder = createViolationResponse(ce.getConstraintViolations());
+		} catch (ValidationException e) {
+			// Handle the unique constrain violation
+			Map<String, String> responseObj = new HashMap<String, String>();
+			responseObj.put("Report Name", "Report Name taken");
+			builder = Response.status(Response.Status.CONFLICT).entity(
+					responseObj);
+		} catch (Exception e) {
+			// Handle generic exceptions
+			Map<String, String> responseObj = new HashMap<String, String>();
+			responseObj.put("error", e.getMessage());
+			builder = Response.status(Response.Status.BAD_REQUEST).entity(
+					responseObj);
+		}
+
+		return builder.build();
+	}
+
+	
+	/**
+	 * Adds a Project to a Companyfrom the values provided. Performs validation,
+	 * and will return a JAX-RS response with either 200 ok, or with a map of
+	 * fields, and related errors.
+	 */
+	@POST
+	@Path("/addArea")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response addArea(AddAreaRequest addAreaRequest) {
+
+		Response.ResponseBuilder builder = null;
+
+		try {
+			if (validatePerson(addAreaRequest.getPersonId(),addAreaRequest.getProjectId())) {
+				// Validates Project using bean validation
+				AreaDTO area = addAreaRequest.getArea();
+				log.info("validating area:" + area.getName());
+				validateArea(addAreaRequest);
+				long id = repository.persist(addAreaRequest);
+				area.setAreaId(id);
+				// Create an "ok" response
+				builder = Response.ok(area);				
+			}
+		} catch (ConstraintViolationException ce) {
+			// Handle bean validation issues
+			builder = createViolationResponse(ce.getConstraintViolations());
+		} catch (ValidationException e) {
+			// Handle the unique constrain violation
+			Map<String, String> responseObj = new HashMap<String, String>();
+			responseObj.put("Report Name", "Report Name taken");
+			builder = Response.status(Response.Status.CONFLICT).entity(
+					responseObj);
+		} catch (Exception e) {
+			// Handle generic exceptions
+			Map<String, String> responseObj = new HashMap<String, String>();
+			responseObj.put("error", e.getMessage());
+			builder = Response.status(Response.Status.BAD_REQUEST).entity(
+					responseObj);
+		}
+
+		return builder.build();
+	}
+
 
 	/**
 	 * Adds a Inspector to a Project from the values provided. Performs
