@@ -4,24 +4,21 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
-import org.codehaus.jackson.annotate.JsonBackReference;
-import org.codehaus.jackson.annotate.JsonManagedReference;
 
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.Set;
-
 
 /**
  * The persistent class for the Area database table.
  * 
  */
 @Entity
-@NamedQuery(name="Area.findAll", query="SELECT a FROM Area a")
+@NamedQuery(name = "Area.findAll", query = "SELECT a FROM Area a")
 public class Area implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long areaId;
 
 	private String comment;
@@ -30,27 +27,28 @@ public class Area implements Serializable {
 
 	private String number;
 
-	@Temporal(TemporalType.DATE)
-	private Date timeStamp;
+	private Timestamp timeStamp;
 
-	//bi-directional many-to-one association to Report
+	// bi-directional many-to-one association to Report
 	@ManyToOne
-	@JsonBackReference
-	@JoinColumn(name="Report_reportId", referencedColumnName="reportId")
+	@com.fasterxml.jackson.annotation.JsonBackReference
+	@JoinColumn(name = "Report_reportId", referencedColumnName = "reportId")
 	private Report report;
 
-	//bi-directional many-to-one association to Asset
-	@OneToMany(fetch=FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE},mappedBy="area")
-//	@IndexColumn(name="assetId")
-	//@LazyCollection(LazyCollectionOption.FALSE)
-	@JsonManagedReference
+	// bi-directional many-to-one association to Asset
+	@OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST,
+			CascadeType.MERGE }, mappedBy = "area")
+	// @IndexColumn(name="assetId")
+	// @LazyCollection(LazyCollectionOption.FALSE)
+	@com.fasterxml.jackson.annotation.JsonManagedReference
 	private Set<Asset> assets;
 
-	//bi-directional many-to-one association to Note
-	@OneToMany(fetch=FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE},mappedBy="area")
-	//@IndexColumn(name="noteId")
-	//@LazyCollection(LazyCollectionOption.FALSE)
-	@JsonManagedReference
+	// bi-directional many-to-one association to Note
+	@OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST,
+			CascadeType.MERGE }, mappedBy = "area")
+	// @IndexColumn(name="noteId")
+	// @LazyCollection(LazyCollectionOption.FALSE)
+	@com.fasterxml.jackson.annotation.JsonManagedReference
 	private Set<Note> notes;
 
 	public Area() {
@@ -88,15 +86,14 @@ public class Area implements Serializable {
 		this.number = number;
 	}
 
-	public Date getTimeStamp() {
+	public Timestamp getTimeStamp() {
 		return this.timeStamp;
 	}
 
-	public void setTimeStamp(Date timeStamp) {
+	public void setTimeStamp(Timestamp timeStamp) {
 		this.timeStamp = timeStamp;
 	}
 
-	
 	public Report getReport() {
 		return this.report;
 	}

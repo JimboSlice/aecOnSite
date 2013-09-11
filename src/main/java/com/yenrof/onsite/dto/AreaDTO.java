@@ -1,11 +1,10 @@
 package com.yenrof.onsite.dto;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.Set;
 
-import org.codehaus.jackson.annotate.JsonBackReference;
-import org.codehaus.jackson.annotate.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * The DTO class for the Area database table.
@@ -22,13 +21,17 @@ public class AreaDTO implements Serializable {
 
 	private String number;
 
-	private Date timeStamp;
-	
-	@JsonBackReference("arearef")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd,HH:00", timezone = "GMT")
+	private Timestamp date;
+
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd,HH:00", timezone = "GMT")
+	private Timestamp timeStamp;
+
+	@com.fasterxml.jackson.annotation.JsonBackReference("arearef")
 	private ReportDTO report;
-	@JsonManagedReference("assetref")
+	@com.fasterxml.jackson.annotation.JsonManagedReference("assetref")
 	private Set<AssetDTO> assets;
-	@JsonManagedReference("noteref")
+	@com.fasterxml.jackson.annotation.JsonManagedReference("noteref")
 	private Set<NoteDTO> notes;
 
 	public AreaDTO() {
@@ -66,11 +69,11 @@ public class AreaDTO implements Serializable {
 		this.number = number;
 	}
 
-	public Date getTimeStamp() {
+	public Timestamp getTimeStamp() {
 		return this.timeStamp;
 	}
 
-	public void setTimeStamp(Date timeStamp) {
+	public void setTimeStamp(Timestamp timeStamp) {
 		this.timeStamp = timeStamp;
 	}
 

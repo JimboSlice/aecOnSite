@@ -4,24 +4,23 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
-import org.codehaus.jackson.annotate.JsonBackReference;
-//import org.codehaus.jackson.annotate.JsonManagedReference;
-
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import java.sql.Timestamp;
 import java.util.Date;
-//import java.util.Set;
 
+//import java.util.Set;
 
 /**
  * The persistent class for the Asset database table.
  * 
  */
 @Entity
-@NamedQuery(name="Asset.findAll", query="SELECT a FROM Asset a")
+@NamedQuery(name = "Asset.findAll", query = "SELECT a FROM Asset a")
 public class Asset implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long assetId;
 
 	private byte appraisalFlag;
@@ -32,18 +31,15 @@ public class Asset implements Serializable {
 
 	private String name;
 
-	@Temporal(TemporalType.DATE)
-	private Date purchaseDate;
+	private Timestamp purchaseDate;
 
-	@Temporal(TemporalType.DATE)
-	private Date timeStamp;
-
+	private Timestamp timeStamp;
 	private String type;
 
-	//bi-directional many-to-one association to Area
+	// bi-directional many-to-one association to Area
 	@ManyToOne
 	@JsonBackReference
-	@JoinColumn(name="Area_areaId")
+	@JoinColumn(name = "Area_areaId")
 	private Area area;
 
 	public Asset() {
@@ -93,15 +89,15 @@ public class Asset implements Serializable {
 		return this.purchaseDate;
 	}
 
-	public void setPurchaseDate(Date purchaseDate) {
+	public void setPurchaseDate(Timestamp purchaseDate) {
 		this.purchaseDate = purchaseDate;
 	}
 
-	public Date getTimeStamp() {
+	public Timestamp getTimeStamp() {
 		return this.timeStamp;
 	}
 
-	public void setTimeStamp(Date timeStamp) {
+	public void setTimeStamp(Timestamp timeStamp) {
 		this.timeStamp = timeStamp;
 	}
 
@@ -120,8 +116,5 @@ public class Asset implements Serializable {
 	public void setArea(Area area) {
 		this.area = area;
 	}
-
-
-	
 
 }

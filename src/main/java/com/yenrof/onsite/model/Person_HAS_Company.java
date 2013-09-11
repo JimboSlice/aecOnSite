@@ -37,6 +37,7 @@ public class Person_HAS_Company implements Serializable {
 		this.timeStamp = timeStamp;
 	}
 
+	 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}

@@ -1,0 +1,38 @@
+IP Address	24.99.17.102
+
+appserver onthe10 -> jboss user
+ubuntu  ???
+
+mySql db -> admin PASSWORD
+
+ssh -2 -i key.pem  ubuntu@ec2-54-211-228-181.compute-1.amazonaws.com -v
+
+sftp appserver@ec2-54-211-228-181.compute-1.amazonaws.com
+
+http://ec2-54-211-228-181.compute-1.amazonaws.com:9990
+
+mysql -h onsiteinstance.c2x3uowzygdy.us-east-1.rds.amazonaws.com -P 3306 -u admin -p
+
+sudo /usr/local/share/jboss/bin/standalone.sh -Djboss.bind.address=10.154.180.68 -Djboss.bind.address.management=10.154.180.68 &
+
+sudo /usr/local/share/jboss/bin/standalone.sh -Djboss.bind.address.management=10.154.180.68 &
+
+sudo /usr/local/share/jboss/bin/jboss-cli.sh --connect command=:shutdown
+
+tail -f /usr/local/share/jboss/standalone/log/server.log
+
+sudo service apache2 start
+
+sudo service apache2 stop
+
+mvn package jboss-as:deploy
+
+////////////////////////
+
+ssh -2 jforn99@192.168.1.4 -l jforn99 -p 37815
+sftp -vvv -oPort=59266 jforn99@192.168.1.4 
+
+mysqldump -u root -ponthe10 onsite > onsite.sql;
+mysql -u root -ponthe10;
+
+

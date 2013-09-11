@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
-import org.codehaus.jackson.annotate.JsonBackReference;
 
 import java.util.Date;
 
@@ -29,10 +28,10 @@ public class PictureDTO implements Serializable {
 
 	private Date timeStamp;
 
-	@JsonBackReference("assetref")
+	@com.fasterxml.jackson.annotation.JsonBackReference("assetref")
 	private AssetDTO asset;
 
-	@JsonBackReference("noteref")
+	@com.fasterxml.jackson.annotation.JsonBackReference("noteref")
 	private NoteDTO note;
 
 	public PictureDTO() {

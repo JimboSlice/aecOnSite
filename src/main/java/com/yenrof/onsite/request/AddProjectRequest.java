@@ -12,7 +12,6 @@ public class AddProjectRequest implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private long companyId;
 
-
 	private ProjectDTO project = new ProjectDTO();
 
 
@@ -33,7 +32,7 @@ public class AddProjectRequest implements Serializable {
 	}
 
 
-	public ProjectDTO getProject() {
+	public ProjectDTO getProject() {       
 		return project;
 	}
 
@@ -41,5 +40,7 @@ public class AddProjectRequest implements Serializable {
 	public void setProject(ProjectDTO project) {
 		this.project = project;
 	}
+
+
 
 }

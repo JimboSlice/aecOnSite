@@ -1,11 +1,12 @@
 package com.yenrof.onsite.dto;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.sql.Timestamp;
 
-import org.codehaus.jackson.annotate.JsonManagedReference;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * The DTO class for the Company database table.
@@ -28,6 +29,10 @@ public class CompanyDTO implements Serializable {
 	private String email;
 
 	private String phone;
+	
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd,HH:00", timezone = "GMT")
+	private Timestamp timeStamp;
+	
 
 	private Set<PersonDTO> persons = new LinkedHashSet<PersonDTO>(0);
 
@@ -38,7 +43,8 @@ public class CompanyDTO implements Serializable {
 	public void setPersons(Set<PersonDTO> persons) {
 		this.persons = persons;
 	}
-	@JsonManagedReference("projectref")
+
+	@com.fasterxml.jackson.annotation.JsonManagedReference("projectref")
 	private Set<ProjectDTO> projects = new LinkedHashSet<ProjectDTO>(0);
 
 	public Set<ProjectDTO> getProjects() {
@@ -49,7 +55,6 @@ public class CompanyDTO implements Serializable {
 		this.projects = projects;
 	}
 
-	private Date timeStamp;
 
 	public CompanyDTO() {
 	}
@@ -118,21 +123,21 @@ public class CompanyDTO implements Serializable {
 		this.phone = phone;
 	}
 
-	public Date getTimeStamp() {
+	public Timestamp getTimeStamp() {
 		return timeStamp;
 	}
 
-	public void setTimeStamp(Date timeStamp) {
+	public void setTimeStamp(Timestamp timeStamp) {
 		this.timeStamp = timeStamp;
 	}
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
-	
+
 	public PersonDTO addPerson(PersonDTO person) {
 		this.getPersons().add(person);
-		//person.addCompany(this);
+		// person.addCompany(this);
 		return person;
 	}
 }

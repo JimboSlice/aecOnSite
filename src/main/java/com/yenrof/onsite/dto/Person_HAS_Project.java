@@ -4,7 +4,10 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * The persistent class for the Person_HAS_Project database table.
@@ -27,11 +30,11 @@ public class Person_HAS_Project implements Serializable {
 		this.projectId = projectId;
 	}
 
-	public Timestamp getTimeStamp() {
+	public Date getTimeStamp() {
 		return timeStamp;
 	}
 
-	public void setTimeStamp(Timestamp timeStamp) {
+	public void setTimeStamp(Date timeStamp) {
 		this.timeStamp = timeStamp;
 	}
 
@@ -49,6 +52,7 @@ public class Person_HAS_Project implements Serializable {
 	private long projectId;
 
 	@Column(name = "timeStamp")
-	private Timestamp timeStamp;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd,HH:00", timezone = "GMT")
+	private Date timeStamp;
 
 }

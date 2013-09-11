@@ -4,8 +4,7 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
-import org.codehaus.jackson.annotate.JsonBackReference;
-//import org.codehaus.jackson.annotate.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import java.util.Date;
 

@@ -4,24 +4,20 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
-import org.codehaus.jackson.annotate.JsonBackReference;
-//import org.codehaus.jackson.annotate.JsonManagedReference;
-
-import java.util.Date;
-//import java.util.Set;
-
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import java.sql.Timestamp;
 
 /**
  * The persistent class for the Note database table.
  * 
  */
 @Entity
-@NamedQuery(name="Note.findAll", query="SELECT n FROM Note n")
+@NamedQuery(name = "Note.findAll", query = "SELECT n FROM Note n")
 public class Note implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long noteId;
 
 	private String displayPic;
@@ -42,15 +38,14 @@ public class Note implements Serializable {
 
 	private byte[] thePic;
 
-	@Temporal(TemporalType.DATE)
-	private Date timeStamp;
+    private Timestamp timeStamp;
 
 	private byte trackableActionItem;
 
-	//bi-directional many-to-one association to Area
+	// bi-directional many-to-one association to Area
 	@ManyToOne
 	@JsonBackReference
-	@JoinColumn(name="Area_areaId")
+	@JoinColumn(name = "Area_areaId")
 	private Area area;
 
 	public Note() {
@@ -136,11 +131,11 @@ public class Note implements Serializable {
 		this.thePic = thePic;
 	}
 
-	public Date getTimeStamp() {
+	public Timestamp getTimeStamp() {
 		return this.timeStamp;
 	}
 
-	public void setTimeStamp(Date timeStamp) {
+	public void setTimeStamp(Timestamp timeStamp) {
 		this.timeStamp = timeStamp;
 	}
 
@@ -152,8 +147,6 @@ public class Note implements Serializable {
 		this.trackableActionItem = trackableActionItem;
 	}
 
-	
-
 	public Area getArea() {
 		return this.area;
 	}
@@ -161,7 +154,5 @@ public class Note implements Serializable {
 	public void setArea(Area area) {
 		this.area = area;
 	}
-
-	
 
 }

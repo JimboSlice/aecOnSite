@@ -4,22 +4,22 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
-import org.codehaus.jackson.annotate.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
-
 
 /**
  * The persistent class for the Picture database table.
  * 
  */
 @Entity
-@NamedQuery(name="Picture.findAll", query="SELECT p FROM Picture p")
+@NamedQuery(name = "Picture.findAll", query = "SELECT p FROM Picture p")
 public class Picture implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long pictureId;
 
 	private String comment;
@@ -30,19 +30,19 @@ public class Picture implements Serializable {
 
 	private byte[] thePic;
 
-	@Temporal(TemporalType.DATE)
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd,HH:00", timezone = "GMT")
 	private Date timeStamp;
 
-	//bi-directional many-to-one association to Asset
+	// bi-directional many-to-one association to Asset
 	@ManyToOne
 	@JsonBackReference("assetref")
-	@JoinColumn(name="Asset_assetId")
+	@JoinColumn(name = "Asset_assetId")
 	private Asset asset;
 
-	//bi-directional many-to-one association to Note
+	// bi-directional many-to-one association to Note
 	@ManyToOne
 	@JsonBackReference("noteref")
-	@JoinColumn(name="Note_noteId")
+	@JoinColumn(name = "Note_noteId")
 	private Note note;
 
 	public Picture() {

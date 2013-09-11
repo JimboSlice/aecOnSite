@@ -3,12 +3,7 @@ package com.yenrof.onsite.model;
 import java.io.Serializable;
 
 import javax.persistence.*;
-
-import org.codehaus.jackson.annotate.JsonBackReference;
-import org.codehaus.jackson.annotate.JsonManagedReference;
-
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.Set;
 
 /**
@@ -32,19 +27,19 @@ public class Report implements Serializable {
 
 	private String rtype;
 
-	//@Temporal(TemporalType.TIMESTAMP
 	private Timestamp timeStamp;
 
-
 	// bi-directional many-to-one association to Project
-	@JsonBackReference("reportref")
-	@ManyToOne(fetch=FetchType.LAZY,cascade={CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinColumn(name="Project_projectId")
+	@com.fasterxml.jackson.annotation.JsonBackReference("reportref")
+	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST,
+			CascadeType.MERGE })
+	@JoinColumn(name = "Project_projectId")
 	private Project project;
 
 	// bi-directional many-to-one association to Area
-	@JsonManagedReference
-	@OneToMany(fetch=FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "report")
+	@com.fasterxml.jackson.annotation.JsonManagedReference
+	@OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST,
+			CascadeType.MERGE }, mappedBy = "report")
 	private Set<Area> areas;
 
 	public Report() {
@@ -90,7 +85,7 @@ public class Report implements Serializable {
 		this.rtype = rtype;
 	}
 
-	public Date getTimeStamp() {
+	public Timestamp getTimeStamp() {
 		return this.timeStamp;
 	}
 
@@ -98,7 +93,6 @@ public class Report implements Serializable {
 		this.timeStamp = timeStamp;
 	}
 
-	
 	public Set<Area> getAreas() {
 		return this.areas;
 	}

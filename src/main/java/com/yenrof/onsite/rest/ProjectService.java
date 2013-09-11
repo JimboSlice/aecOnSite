@@ -16,7 +16,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 import com.yenrof.onsite.dto.AreaDTO;
 import com.yenrof.onsite.dto.AssetDTO;
 import com.yenrof.onsite.dto.CompanyDTO;
@@ -38,11 +37,12 @@ import com.yenrof.onsite.request.AddReportRequest;
  * This class produces a RESTful service to read/write the contents of the
  * Project table.
  */
-@Path("/onsite")
+@Path("/onsite") 
 @RequestScoped
 @Stateful
 public class ProjectService extends Service {
 
+	
 	@GET
 	@Path("/getProjects")
 	@Produces(MediaType.APPLICATION_JSON)

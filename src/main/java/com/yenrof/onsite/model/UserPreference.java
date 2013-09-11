@@ -4,8 +4,6 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
-//import org.codehaus.jackson.annotate.JsonBackReference;
-import org.codehaus.jackson.annotate.JsonManagedReference;
 
 import java.util.Date;
 
@@ -56,7 +54,7 @@ public class UserPreference implements Serializable {
 
 	//bi-directional one-to-one association to AppCustom
 	@OneToOne(mappedBy="userPreference", cascade={CascadeType.ALL})
-	@JsonManagedReference
+	@com.fasterxml.jackson.annotation.JsonManagedReference
 	private AppCustom appCustom;
 
 	//bi-directional one-to-one association to Report

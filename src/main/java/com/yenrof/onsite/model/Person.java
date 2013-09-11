@@ -1,23 +1,18 @@
 package com.yenrof.onsite.model;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-
-
-
-
-
-//import org.codehaus.jackson.annotate.JsonBackReference;
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
-//import org.codehaus.jackson.annotate.JsonManagedReference;
+ import com.fasterxml.jackson.annotation.JsonIgnore;
 
+ 
 /**
  * The persistent class for the Person database table.
  * 
@@ -47,6 +42,9 @@ public class Person implements Serializable {
 
 	@Column(name = "role")
 	private String role;
+	
+ 	private Timestamp timeStamp;
+
 
 	// bi-directional many-to-many association to Projects - DONT NEED IN JSON
 	// FORMAT
@@ -133,6 +131,14 @@ public class Person implements Serializable {
 	public Company addCompany(Company company) {
 		this.getCompanies().add(company);
 		return company;
+	}
+
+	public Timestamp getTimeStamp() {
+		return timeStamp;
+	}
+
+	public void setTimeStamp(Timestamp timeStamp) {
+		this.timeStamp = timeStamp;
 	}
 
 }

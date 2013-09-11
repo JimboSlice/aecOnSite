@@ -5,12 +5,11 @@ import java.io.Serializable;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
-import org.codehaus.jackson.annotate.JsonManagedReference;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import com.yenrof.onsite.dto.PersonDTO;
+ import com.yenrof.onsite.dto.PersonDTO;
 
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -46,10 +45,9 @@ public class Company implements Serializable {
 
 	// bi-directional many-to-many association to persons with association
 	// table
-	@ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinTable(name = "Person_HAS_Company", 
-	joinColumns = { @JoinColumn(name = "companyId", nullable = false, updatable = false) }, 
-	inverseJoinColumns = { @JoinColumn(name = "personId", nullable = false, updatable = false) })
+	@ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST,
+			CascadeType.MERGE })
+	@JoinTable(name = "Person_HAS_Company", joinColumns = { @JoinColumn(name = "companyId", nullable = false, updatable = false) }, inverseJoinColumns = { @JoinColumn(name = "personId", nullable = false, updatable = false) })
 	private Set<Person> persons = new LinkedHashSet<Person>(0);
 
 	public Set<Person> getPersons() {
@@ -61,8 +59,9 @@ public class Company implements Serializable {
 	}
 
 	// bi-directional many-to-one association to Project
-	@JsonManagedReference("projectref")
-	@OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "company")
+	@com.fasterxml.jackson.annotation.JsonManagedReference("projectref")
+	@OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST,
+			CascadeType.MERGE }, mappedBy = "company")
 	private Set<Project> projects = new LinkedHashSet<Project>(0);
 
 	public Set<Project> getProjects() {
@@ -73,8 +72,7 @@ public class Company implements Serializable {
 		this.projects = projects;
 	}
 
-	@Temporal(TemporalType.DATE)
-	private Date timeStamp;
+	private Timestamp timeStamp;
 
 	public Company() {
 	}
@@ -143,26 +141,26 @@ public class Company implements Serializable {
 		this.phone = phone;
 	}
 
-	public Date getTimeStamp() {
+	public Timestamp getTimeStamp() {
 		return timeStamp;
 	}
 
-	public void setTimeStamp(Date timeStamp) {
+	public void setTimeStamp(Timestamp timeStamp) {
 		this.timeStamp = timeStamp;
 	}
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
-	
+
 	public Person addPerson(Person person) {
 		this.getPersons().add(person);
 		person.addCompany(this);
 		return person;
 	}
-	
+
 	public PersonDTO addPerson(PersonDTO person) {
-//JKF convert to person then add		
+		// JKF convert to person then add
 		return person;
 	}
 }

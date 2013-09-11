@@ -1,11 +1,11 @@
  package com.yenrof.onsite.dto;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-
-import org.codehaus.jackson.annotate.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 
 
@@ -25,14 +25,26 @@ public class PersonDTO implements Serializable {
 	
 	private String role;
 	
+	 @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd,HH:00", timezone="GMT")
+	private Timestamp timeStamp;
+
 	
+	
+	public Timestamp getTimeStamp() {
+		return timeStamp;
+	}
+
+	public void setTimeStamp(Timestamp timeStamp) {
+		this.timeStamp = timeStamp;
+	}
+
 	// bi-directional many-to-many association to Projects - DONT NEED IN JSON
 	// FORMAT
-	@JsonIgnore
+	@com.fasterxml.jackson.annotation.JsonIgnore
 	private Set<ProjectDTO> projects = new LinkedHashSet<ProjectDTO>(0);
 	// bi-directional many-to-many association to Company - DONT NEED IN JSON
 	// FORMAT
-	@JsonIgnore
+	@com.fasterxml.jackson.annotation.JsonIgnore
 	private Set<CompanyDTO> companies = new LinkedHashSet<CompanyDTO>(0);
 
 	public Set<CompanyDTO> getCompanies() {
@@ -95,19 +107,5 @@ public class PersonDTO implements Serializable {
 		return serialVersionUID;
 	}
 
-/*	public ProjectDTO addProject(ProjectDTO project) {
-		this.getProjects().add(project);
-		return project;
-	}
-
-	public ProjectDTO removeProject(ProjectDTO project) {
-		getProjects().remove(project);
-		return project;
-	}
-
-	public CompanyDTO addCompany(CompanyDTO company) {
-		this.getCompanies().add(company);
-		return company;
-	}*/
 
 }

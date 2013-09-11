@@ -5,8 +5,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Set;
 
-import org.codehaus.jackson.annotate.JsonBackReference;
-import org.codehaus.jackson.annotate.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * The DTO class for the Report database table.
@@ -25,10 +24,12 @@ public class ReportDTO implements Serializable {
 
 	private String rtype;
 
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd,HH:00", timezone = "GMT")
 	private Timestamp timeStamp;
-	@JsonBackReference("reportref")
+
+	@com.fasterxml.jackson.annotation.JsonBackReference("reportref")
 	private ProjectDTO project;
-	@JsonManagedReference("arearef")
+	@com.fasterxml.jackson.annotation.JsonManagedReference("arearef")
 	private Set<AreaDTO> areas;
 
 	public ReportDTO() {

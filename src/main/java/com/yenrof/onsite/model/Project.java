@@ -6,14 +6,13 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.codehaus.jackson.annotate.JsonBackReference;
-import org.codehaus.jackson.annotate.JsonManagedReference;
-import org.hibernate.validator.constraints.NotEmpty;
+ import org.hibernate.validator.constraints.NotEmpty;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.yenrof.onsite.dto.PersonDTO;
 
 /**
@@ -61,7 +60,6 @@ public class Project implements Serializable {
 	private String state;
 
 	private String subAddress;
-
 	private Timestamp timeStamp;
 
 	private String uniqueRoomName;
@@ -218,7 +216,7 @@ public class Project implements Serializable {
 		this.subAddress = subAddress;
 	}
 
-	public Date getTimeStamp() {
+	public Timestamp getTimeStamp() {
 		return this.timeStamp;
 	}
 

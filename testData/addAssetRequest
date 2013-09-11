@@ -1,0 +1,11 @@
+{  "personId":"01",
+   "areaId":"12",
+   "asset":{
+		"name": "name1",
+		"type": "type1",
+	    "timeStamp": "2013-03-19T23:38:23.919Z",
+		"description": "description1"
+	}
+}
+
+http://www.yenrof.com/rest/onsite/addAsset

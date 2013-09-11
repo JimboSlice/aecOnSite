@@ -38,7 +38,6 @@ import com.yenrof.onsite.model.Person_HAS_Project;
 import com.yenrof.onsite.model.Project;
 import com.yenrof.onsite.model.Report;
 import com.yenrof.onsite.model.UserCredential;
-import com.yenrof.onsite.service.ProjectRegistration;
 
 public class Service {
 
@@ -50,9 +49,6 @@ public class Service {
 
 	@Inject
 	protected ProjectRepository repository;
-
-	@Inject
-	ProjectRegistration registration;
 
 	/**
 	 * <p>
@@ -697,5 +693,7 @@ public class Service {
 		return personProject != null;
 
 	}
+	
+	
 
 }

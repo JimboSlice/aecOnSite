@@ -2,9 +2,10 @@ package com.yenrof.onsite.dto;
 
 import java.io.Serializable;
 
-import javax.persistence.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * The persistent class for the Person_HAS_Project database table.
@@ -27,7 +28,7 @@ public class Person_HAS_Company implements Serializable {
 		this.companyId = companyId;
 	}
 
-	public Timestamp getTimeStamp() {
+	public Date getTimeStamp() {
 		return timeStamp;
 	}
 
@@ -41,14 +42,11 @@ public class Person_HAS_Company implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	@Column(name = "personId")
-	private long personId;
+ 	private long personId;
 
-	@Column(name = "companyId")
-	private long companyId;
+ 	private long companyId;
 
-	@Column(name = "timeStamp")
+	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd,HH:00", timezone="GMT")	
 	private Timestamp timeStamp;
 
 }

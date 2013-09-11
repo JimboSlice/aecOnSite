@@ -4,6 +4,7 @@
                     "rtype":"M",
                     "rname":"report1",
    					"peopleOnSite": 23,
+   					"timeStamp": "2013-03-19T23:38:23.919Z",
    					"constructionphase": "starting"
            } 
 }

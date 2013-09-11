@@ -2,15 +2,12 @@ package com.yenrof.onsite.dto;
 
 import java.io.Serializable;
 
-
-
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.codehaus.jackson.annotate.JsonBackReference;
-import org.codehaus.jackson.annotate.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 /**
  * The DTO class for the Project database table.
  * 
@@ -19,7 +16,6 @@ public class ProjectDTO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	
 	private long projectId;
 
 	private String address;
@@ -46,19 +42,22 @@ public class ProjectDTO implements Serializable {
 	private String state;
 
 	private String subAddress;
-
+	
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd,HH:00", timezone = "GMT")
 	private Timestamp timeStamp;
 
+	// @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd,HH:00",
+	// timezone="GMT")
 	private String uniqueRoomName;
 
 	private String zipcode;
-	
-	@JsonBackReference("projectref")
+
+	@com.fasterxml.jackson.annotation.JsonBackReference("projectref")
 	private CompanyDTO company;
 
-	@JsonManagedReference("reportref")
+	@com.fasterxml.jackson.annotation.JsonManagedReference("reportref")
 	private Set<ReportDTO> reports;
-	
+
 	private Set<PersonDTO> persons = new LinkedHashSet<PersonDTO>(0);
 
 	public Set<PersonDTO> getPersons() {
@@ -188,14 +187,6 @@ public class ProjectDTO implements Serializable {
 		this.subAddress = subAddress;
 	}
 
-	public Date getTimeStamp() {
-		return this.timeStamp;
-	}
-
-	public void setTimeStamp(Timestamp timeStamp) {
-		this.timeStamp = timeStamp;
-	}
-
 	public String getUniqueRoomName() {
 		return this.uniqueRoomName;
 	}
@@ -233,10 +224,10 @@ public class ProjectDTO implements Serializable {
 
 		return report;
 	}
-	
+
 	public PersonDTO addPerson(PersonDTO person) {
 		this.getPersons().add(person);
-		//person.addProject(this);
+		// person.addProject(this);
 		return person;
 	}
 
@@ -244,7 +235,7 @@ public class ProjectDTO implements Serializable {
 		getPersons().remove(person);
 		return person;
 	}
-	
+
 	public CompanyDTO getCompany() {
 		return company;
 	}
@@ -253,6 +244,12 @@ public class ProjectDTO implements Serializable {
 		this.company = company;
 	}
 
-	
+	public Timestamp getTimeStamp() {
+		return timeStamp;
+	}
+
+	public void setTimeStamp(Timestamp timeStamp) {
+		this.timeStamp = timeStamp;
+	}
 
 }

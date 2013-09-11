@@ -57,6 +57,11 @@ public class ProjectRepository {
 		return company;
 	}
 	
+	public Person findPersonById(long id) {
+		Person person = em.find(Person.class, id);
+		return person;
+	}
+	
 	public Area findAreaById(long id) {
 		Area area = em.find(Area.class, id);
 		return area;		
@@ -82,14 +87,14 @@ public class ProjectRepository {
 
 	public Person_HAS_Project findPersonProject(
 			AddPersonToProjectRequest addPersonToProjectRequest) {
-		Person dbPerson = null;
+		//Person dbPerson = null;
 		log.info("findPersonProject:"
-				+ addPersonToProjectRequest.getPerson().getEmail());
-		dbPerson = findByUserName(addPersonToProjectRequest.getPerson()
-				.getEmail());
+				+ addPersonToProjectRequest.getPerson().getPersonId());
+		//dbPerson = findPersonById(addPersonToProjectRequest.getPerson()
+		//		.getPersonId());
 		String select = "SELECT * FROM Person_HAS_Project where personId=:personId and projectId=:projectId";
 		Query query = em.createNativeQuery(select, Person_HAS_Project.class);
-		query.setParameter("personId", dbPerson.getPersonId());
+		query.setParameter("personId", addPersonToProjectRequest.getPerson().getPersonId());
 		query.setParameter("projectId",
 				addPersonToProjectRequest.getProjectId());
 		return (Person_HAS_Project) query.getSingleResult();
@@ -280,7 +285,7 @@ public class ProjectRepository {
 		PersonDTO person = addPersonToProjectRequest.getPerson();
 		Person dbPerson = null;
 		try {
-			dbPerson = findByUserName(person.getEmail());
+			dbPerson = findPersonById(person.getPersonId());
 			// existing user - don't add to Project just add
 			// association
 			Person_HAS_Project php = new Person_HAS_Project();

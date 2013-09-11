@@ -3,7 +3,6 @@ package com.yenrof.onsite.model;
 import java.io.Serializable;
 
 import javax.persistence.*;
-
 import java.sql.Timestamp;
 
 /**
@@ -49,8 +48,6 @@ public class Person_HAS_Project implements Serializable {
 
 	@Column(name = "projectId")
 	private long projectId;
-
-	@Column(name = "timeStamp")
-	private Timestamp timeStamp;
+ 	private Timestamp timeStamp;
 
 }

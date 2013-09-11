@@ -4,12 +4,9 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
-import org.codehaus.jackson.annotate.JsonBackReference;
-//import org.codehaus.jackson.annotate.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.util.Date;
-
-
+import java.sql.Timestamp;
 
 /**
  * The DTO class for the Asset database table.
@@ -30,15 +27,16 @@ public class AssetDTO implements Serializable {
 
 	private String name;
 
-	@Temporal(TemporalType.DATE)
-	private Date purchaseDate;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd,HH:00", timezone = "GMT")
+	private Timestamp purchaseDate;
 
-	@Temporal(TemporalType.DATE)
-	private Date timeStamp;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd,HH:00", timezone = "GMT")
+	private Timestamp timeStamp;
+
 
 	private String type;
 
-	@JsonBackReference("assetref")
+	@com.fasterxml.jackson.annotation.JsonBackReference("assetref")
 	private AreaDTO area;
 
 	public AssetDTO() {
@@ -84,19 +82,19 @@ public class AssetDTO implements Serializable {
 		this.name = name;
 	}
 
-	public Date getPurchaseDate() {
+	public Timestamp getPurchaseDate() {
 		return this.purchaseDate;
 	}
 
-	public void setPurchaseDate(Date purchaseDate) {
+	public void setPurchaseDate(Timestamp purchaseDate) {
 		this.purchaseDate = purchaseDate;
 	}
 
-	public Date getTimeStamp() {
+	public Timestamp getTimeStamp() {
 		return this.timeStamp;
 	}
 
-	public void setTimeStamp(Date timeStamp) {
+	public void setTimeStamp(Timestamp timeStamp) {
 		this.timeStamp = timeStamp;
 	}
 
