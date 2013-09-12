@@ -52,7 +52,7 @@ public class Person_HAS_Project implements Serializable {
 	private long projectId;
 
 	@Column(name = "timeStamp")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd,HH:00", timezone = "GMT")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT")
 	private Date timeStamp;
 
 }

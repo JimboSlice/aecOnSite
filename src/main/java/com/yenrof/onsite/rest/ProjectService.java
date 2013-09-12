@@ -16,6 +16,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.yenrof.onsite.dto.AreaDTO;
 import com.yenrof.onsite.dto.AssetDTO;
 import com.yenrof.onsite.dto.CompanyDTO;
@@ -37,12 +40,11 @@ import com.yenrof.onsite.request.AddReportRequest;
  * This class produces a RESTful service to read/write the contents of the
  * Project table.
  */
-@Path("/onsite") 
+@Path("/onsite")
 @RequestScoped
 @Stateful
 public class ProjectService extends Service {
 
-	
 	@GET
 	@Path("/getProjects")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -142,9 +144,10 @@ public class ProjectService extends Service {
 
 			long id = repository.persist(addPersonRequest);
 			person.setPersonId(id);
-			// Create an "ok" response
-			// builder = Response.ok();
-			builder = Response.ok(person);
+			ObjectMapper objectMapper = new ObjectMapper();
+			objectMapper.configure(
+					SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+			builder = Response.ok(objectMapper.writeValueAsString(person));
 		} catch (ConstraintViolationException ce) {
 			// Handle bean validation issues
 			builder = createViolationResponse(ce.getConstraintViolations());
@@ -166,9 +169,9 @@ public class ProjectService extends Service {
 	}
 
 	/**
-	 * Creates a new Company from the values provided. Performs
-	 * validation, and will return a JAX-RS response with either 200 ok, or with
-	 * a map of fields, and related errors.
+	 * Creates a new Company from the values provided. Performs validation, and
+	 * will return a JAX-RS response with either 200 ok, or with a map of
+	 * fields, and related errors.
 	 */
 	@POST
 	@Path("/addCompany")
@@ -184,9 +187,10 @@ public class ProjectService extends Service {
 
 			long companyId = repository.persist(company);
 			company.setCompanyId(companyId);
-			// Create an "ok" response
-			// builder = Response.ok();
-			builder = Response.ok(company);
+			ObjectMapper objectMapper = new ObjectMapper();
+			objectMapper.configure(
+					SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+			builder = Response.ok(objectMapper.writeValueAsString(company));
 		} catch (ConstraintViolationException ce) {
 			// Handle bean validation issues
 			builder = createViolationResponse(ce.getConstraintViolations());
@@ -227,8 +231,10 @@ public class ProjectService extends Service {
 			validateProject(addProjectRequest);
 			long id = repository.persist(addProjectRequest);
 			project.setProjectId(id);
-			// Create an "ok" response
-			builder = Response.ok(project);
+			ObjectMapper objectMapper = new ObjectMapper();
+			objectMapper.configure(
+					SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+			builder = Response.ok(objectMapper.writeValueAsString(project));
 		} catch (ConstraintViolationException ce) {
 			// Handle bean validation issues
 			builder = createViolationResponse(ce.getConstraintViolations());
@@ -248,7 +254,7 @@ public class ProjectService extends Service {
 
 		return builder.build();
 	}
-	
+
 	/**
 	 * Adds a Project to a Companyfrom the values provided. Performs validation,
 	 * and will return a JAX-RS response with either 200 ok, or with a map of
@@ -263,15 +269,18 @@ public class ProjectService extends Service {
 		Response.ResponseBuilder builder = null;
 
 		try {
-			if (validatePerson(addReportRequest.getPersonId(),addReportRequest.getProjectId())) {
+			if (validatePerson(addReportRequest.getPersonId(),
+					addReportRequest.getProjectId())) {
 				// Validates Project using bean validation
 				ReportDTO report = addReportRequest.getReport();
 				log.info("validating report:" + report.getRname());
 				validateReport(addReportRequest);
 				long id = repository.persist(addReportRequest);
 				report.setReportId(id);
-				// Create an "ok" response
-				builder = Response.ok(report);				
+				ObjectMapper objectMapper = new ObjectMapper();
+				objectMapper.configure(
+						SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+				builder = Response.ok(objectMapper.writeValueAsString(report));
 			}
 		} catch (ConstraintViolationException ce) {
 			// Handle bean validation issues
@@ -293,7 +302,6 @@ public class ProjectService extends Service {
 		return builder.build();
 	}
 
-	
 	/**
 	 * Adds a Project to a Companyfrom the values provided. Performs validation,
 	 * and will return a JAX-RS response with either 200 ok, or with a map of
@@ -308,15 +316,18 @@ public class ProjectService extends Service {
 		Response.ResponseBuilder builder = null;
 
 		try {
-			if (validatePerson(addAreaRequest.getPersonId(),addAreaRequest.getProjectId())) {
+			if (validatePerson(addAreaRequest.getPersonId(),
+					addAreaRequest.getProjectId())) {
 				// Validates Project using bean validation
 				AreaDTO area = addAreaRequest.getArea();
 				log.info("validating area:" + area.getName());
 				validateArea(addAreaRequest);
 				long id = repository.persist(addAreaRequest);
 				area.setAreaId(id);
-				// Create an "ok" response
-				builder = Response.ok(area);				
+				ObjectMapper objectMapper = new ObjectMapper();
+				objectMapper.configure(
+						SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+				builder = Response.ok(objectMapper.writeValueAsString(area));
 			}
 		} catch (ConstraintViolationException ce) {
 			// Handle bean validation issues
@@ -337,7 +348,6 @@ public class ProjectService extends Service {
 
 		return builder.build();
 	}
-
 
 	/**
 	 * Adds a Inspector to a Project from the values provided. Performs
@@ -380,7 +390,7 @@ public class ProjectService extends Service {
 
 		return builder.build();
 	}
-	
+
 	/**
 	 * Adds a Asset to a Report from the values provided. Performs validation,
 	 * and will return a JAX-RS response with either 200 ok, or with a map of
@@ -402,7 +412,10 @@ public class ProjectService extends Service {
 			long id = repository.persist(addAssetRequest);
 			asset.setAssetId(id);
 			// Create an "ok" response
-			builder = Response.ok(asset);
+			ObjectMapper objectMapper = new ObjectMapper();
+			objectMapper.configure(
+					SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+			builder = Response.ok(objectMapper.writeValueAsString(asset));
 		} catch (ConstraintViolationException ce) {
 			// Handle bean validation issues
 			builder = createViolationResponse(ce.getConstraintViolations());
@@ -422,7 +435,7 @@ public class ProjectService extends Service {
 
 		return builder.build();
 	}
-	
+
 	/**
 	 * Adds a Asset to a Report from the values provided. Performs validation,
 	 * and will return a JAX-RS response with either 200 ok, or with a map of
@@ -443,8 +456,10 @@ public class ProjectService extends Service {
 			validateNote(addNoteRequest);
 			long id = repository.persist(addNoteRequest);
 			note.setNoteId(id);
-			// Create an "ok" response
-			builder = Response.ok(note);
+			ObjectMapper objectMapper = new ObjectMapper();
+			objectMapper.configure(
+					SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+			builder = Response.ok(objectMapper.writeValueAsString(note));
 		} catch (ConstraintViolationException ce) {
 			// Handle bean validation issues
 			builder = createViolationResponse(ce.getConstraintViolations());
@@ -464,7 +479,5 @@ public class ProjectService extends Service {
 
 		return builder.build();
 	}
-
-
 
 }

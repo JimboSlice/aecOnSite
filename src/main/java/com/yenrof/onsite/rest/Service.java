@@ -49,6 +49,8 @@ public class Service {
 
 	@Inject
 	protected ProjectRepository repository;
+	
+	
 
 	/**
 	 * <p>

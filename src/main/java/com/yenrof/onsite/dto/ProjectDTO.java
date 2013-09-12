@@ -43,11 +43,8 @@ public class ProjectDTO implements Serializable {
 
 	private String subAddress;
 	
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd,HH:00", timezone = "GMT")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT")
 	private Timestamp timeStamp;
-
-	// @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd,HH:00",
-	// timezone="GMT")
 	private String uniqueRoomName;
 
 	private String zipcode;

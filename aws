@@ -30,7 +30,7 @@ mvn package jboss-as:deploy
 ////////////////////////
 
 ssh -2 jforn99@192.168.1.4 -l jforn99 -p 37815
-sftp -vvv -oPort=59266 jforn99@192.168.1.4 
+sftp -vvv -oPort=59266 jforn99@192.168.1.4 dothe100
 
 mysqldump -u root -ponthe10 onsite > onsite.sql;
 mysql -u root -ponthe10;

@@ -102,12 +102,6 @@
 				<scope>import</scope>
 			</dependency>
 			<dependency>
-				<groupId>org.jboss.resteasy</groupId>
-				<artifactId>resteasy-jaxrs</artifactId>
-				<version>2.3.1.GA</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
 				<groupId>org.jboss.spec</groupId>
 				<artifactId>jboss-javaee-web-6.0</artifactId>
 				<version>3.0.0.Final</version>
@@ -143,6 +137,7 @@
 			<scope>provided</scope>
 		</dependency>
 
+
 		<!-- Import the JPA API, we use provided scope as the API is included in 
 			JBoss -->
 		<dependency>
@@ -168,9 +163,50 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-jaxrs</artifactId>
+			<version>2.3.1.GA</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-core-asl</artifactId>
-			<version>1.6.0</version>
+			<artifactId>jackson-jaxrs</artifactId>
+			<version>1.9.13</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>1.9.13</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-jackson-provider</artifactId>
+			<version>1.1.GA</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>2.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>2.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.0.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>ma.glasnost.orika</groupId>
+			<artifactId>orika-core</artifactId>
+			<version>1.4.2</version><!-- or latest version -->
 		</dependency>
 
 

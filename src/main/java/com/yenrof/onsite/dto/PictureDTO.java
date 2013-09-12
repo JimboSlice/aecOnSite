@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
 
@@ -25,7 +26,8 @@ public class PictureDTO implements Serializable {
 	private double longitude;
 
 	private byte[] thePic;
-
+	
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT")
 	private Date timeStamp;
 
 	@com.fasterxml.jackson.annotation.JsonBackReference("assetref")

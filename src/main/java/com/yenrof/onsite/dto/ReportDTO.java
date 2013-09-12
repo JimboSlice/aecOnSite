@@ -24,7 +24,7 @@ public class ReportDTO implements Serializable {
 
 	private String rtype;
 
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd,HH:00", timezone = "GMT")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT")
 	private Timestamp timeStamp;
 
 	@com.fasterxml.jackson.annotation.JsonBackReference("reportref")
