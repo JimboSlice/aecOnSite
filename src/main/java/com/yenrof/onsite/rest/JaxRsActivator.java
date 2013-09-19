@@ -16,18 +16,59 @@
  */
 package com.yenrof.onsite.rest;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.logging.Logger;
+
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
+import com.yenrof.onsite.exception.BadRequestExceptionMapper;
+import com.yenrof.onsite.exception.ConstraintExceptionMapper;
+import com.yenrof.onsite.exception.EntityCreationException;
+import com.yenrof.onsite.exception.NotFoundExceptionMapper;
+
 /**
- * A class extending {@link Application} and annotated with @ApplicationPath is the Java EE 6 "no XML" approach to activating
- * JAX-RS.
+ * A class extending {@link Application} and annotated with @ApplicationPath is
+ * the Java EE 6 "no XML" approach to activating JAX-RS.
  * 
  * <p>
- * Resources are served relative to the servlet path specified in the {@link ApplicationPath} annotation.
+ * Resources are served relative to the servlet path specified in the
+ * {@link ApplicationPath} annotation.
  * </p>
  */
 @ApplicationPath("/rest")
 public class JaxRsActivator extends Application {
-    /* class body intentionally left blank */
+	/* class body intentionally left blank */
+	private static final Logger Log = Logger.getLogger(JaxRsActivator.class
+			.getName());
+
+	private Set<Object> singletons = new HashSet<Object>();
+	private Set<Class<?>> classes = new HashSet<Class<?>>();
+
+	//tr8769912
+	public JaxRsActivator() {
+		Log.info("JaxRsActivator consructor ");
+		singletons.add( new OnsiteDTOWriter());
+		singletons.add(new JacksonConfig());
+		classes.add(ProjectService.class);
+		classes.add(LoginService.class);
+		classes.add(BadRequestExceptionMapper.class);
+		classes.add(ConstraintExceptionMapper.class);
+		classes.add(NotFoundExceptionMapper.class);
+		classes.add(EntityCreationException.class);		
+	}
+
+	@Override
+	public Set<Object> getSingletons() {
+		Log.info("JaxRsActivator getSingletons ");
+		Set<Object> defaults = super.getSingletons();
+		singletons.addAll(defaults);
+		return singletons;
+	}
+
+	public Set<Class<?>> getClasses() {
+		Log.info("JaxRsActivator getClasses ");
+		return classes;
+	}
 }

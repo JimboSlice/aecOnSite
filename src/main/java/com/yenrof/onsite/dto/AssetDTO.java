@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import org.codehaus.jackson.annotate.JsonBackReference;
 
 import java.sql.Timestamp;
 
@@ -27,16 +27,14 @@ public class AssetDTO implements Serializable {
 
 	private String name;
 
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT")
-	private Timestamp purchaseDate;
+    private Timestamp purchaseDate;
 
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT")
 	private Timestamp timeStamp;
 
 
 	private String type;
 
-	@com.fasterxml.jackson.annotation.JsonBackReference("assetref")
+	@JsonBackReference("assetref")
 	private AreaDTO area;
 
 	public AssetDTO() {

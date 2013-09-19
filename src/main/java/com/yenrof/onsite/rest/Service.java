@@ -306,9 +306,8 @@ public class Service {
 			log.info("Report-Project Relationship Already Exists  violation: "
 					+ addReportRequest.getReport().getReportId() + " " + addReportRequest.getProjectId());
 			throw new ValidationException(
-					"Person Project Already Exists  Violation");
+					"Report-Project Relationship Violation " + " " + addReportRequest.getReport().getReportId());
 		}
-
 	}
 
 	/**
@@ -468,7 +467,7 @@ public class Service {
 		if (projectNumberAlreadyExists(addProjectRequest)) {
 			log.info("Project Number  violation: " + addProjectRequest.getProject().getProjectName()
 					+ " " + addProjectRequest.getProject().getProjectNumber());
-			throw new ValidationException("Unique Project Number Violation");
+			throw new ValidationException("Unique Project Number Violation " + " " + addProjectRequest.getProject().getProjectNumber());
 		}
 	}
 
@@ -685,15 +684,12 @@ public class Service {
 	 * @return True if the person/project matches and false otherwise
 	 */
 
-	protected boolean validatePerson(long personId, long projectId) {
-		Person_HAS_Project personProject = null;
+	protected void validatePerson(long personId, long projectId) {
 		try {
-			personProject = repository.findPersonProject(personId, projectId);
+			repository.findPersonProject(personId, projectId);
 		} catch (NoResultException e) {
-			// ignore
+			throw new ValidationException("Person is not assigned to Project");
 		}
-		return personProject != null;
-
 	}
 	
 	

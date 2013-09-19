@@ -3,9 +3,7 @@ package com.yenrof.onsite.dto;
 import java.io.Serializable;
 
 import javax.persistence.*;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-
+import org.codehaus.jackson.annotate.JsonBackReference;
 import java.util.Date;
 
 /**
@@ -27,13 +25,12 @@ public class PictureDTO implements Serializable {
 
 	private byte[] thePic;
 	
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT")
-	private Date timeStamp;
+ 	private Date timeStamp;
 
-	@com.fasterxml.jackson.annotation.JsonBackReference("assetref")
+	@JsonBackReference("assetref")
 	private AssetDTO asset;
 
-	@com.fasterxml.jackson.annotation.JsonBackReference("noteref")
+	@JsonBackReference("noteref")
 	private NoteDTO note;
 
 	public PictureDTO() {

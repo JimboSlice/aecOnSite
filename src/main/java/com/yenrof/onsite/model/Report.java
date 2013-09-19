@@ -3,6 +3,10 @@ package com.yenrof.onsite.model;
 import java.io.Serializable;
 
 import javax.persistence.*;
+
+import org.codehaus.jackson.annotate.JsonBackReference;
+import org.codehaus.jackson.annotate.JsonManagedReference;
+
 import java.sql.Timestamp;
 import java.util.Set;
 
@@ -30,14 +34,14 @@ public class Report implements Serializable {
 	private Timestamp timeStamp;
 
 	// bi-directional many-to-one association to Project
-	@com.fasterxml.jackson.annotation.JsonBackReference("reportref")
+	@JsonBackReference("reportref")
 	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST,
 			CascadeType.MERGE })
 	@JoinColumn(name = "Project_projectId")
 	private Project project;
 
 	// bi-directional many-to-one association to Area
-	@com.fasterxml.jackson.annotation.JsonManagedReference
+	@JsonManagedReference
 	@OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST,
 			CascadeType.MERGE }, mappedBy = "report")
 	private Set<Area> areas;

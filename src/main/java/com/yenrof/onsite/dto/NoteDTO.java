@@ -3,8 +3,8 @@ package com.yenrof.onsite.dto;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
+import org.codehaus.jackson.annotate.JsonBackReference;
+ 
 
 /**
  * The DTO class for the Note database table.
@@ -33,12 +33,11 @@ public class NoteDTO implements Serializable {
 
 	private byte[] thePic;
 
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT")
-	private Timestamp timeStamp;
+	 private Timestamp timeStamp;
 
 	private byte trackableActionItem;
 	
-	@com.fasterxml.jackson.annotation.JsonBackReference("noteref")
+	@JsonBackReference("noteref")
 	private AreaDTO area;
 
 	public NoteDTO() {

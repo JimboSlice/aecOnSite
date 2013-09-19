@@ -4,8 +4,7 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import org.codehaus.jackson.annotate.JsonBackReference;
 
 import java.util.Date;
 
@@ -30,8 +29,7 @@ public class Picture implements Serializable {
 
 	private byte[] thePic;
 
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd,HH:00", timezone = "GMT")
-	private Date timeStamp;
+ 	private Date timeStamp;
 
 	// bi-directional many-to-one association to Asset
 	@ManyToOne

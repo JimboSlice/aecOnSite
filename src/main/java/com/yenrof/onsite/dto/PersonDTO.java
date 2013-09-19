@@ -5,7 +5,7 @@ import java.sql.Timestamp;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 
 
@@ -25,7 +25,6 @@ public class PersonDTO implements Serializable {
 	
 	private String role;
 	
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT")
 	private Timestamp timeStamp;
 
 	
@@ -40,11 +39,11 @@ public class PersonDTO implements Serializable {
 
 	// bi-directional many-to-many association to Projects - DONT NEED IN JSON
 	// FORMAT
-	@com.fasterxml.jackson.annotation.JsonIgnore
+	@JsonIgnore
 	private Set<ProjectDTO> projects = new LinkedHashSet<ProjectDTO>(0);
 	// bi-directional many-to-many association to Company - DONT NEED IN JSON
 	// FORMAT
-	@com.fasterxml.jackson.annotation.JsonIgnore
+	@JsonIgnore
 	private Set<CompanyDTO> companies = new LinkedHashSet<CompanyDTO>(0);
 
 	public Set<CompanyDTO> getCompanies() {

@@ -6,7 +6,8 @@ import java.util.Set;
 import java.sql.Timestamp;
 
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+
+import org.codehaus.jackson.annotate.JsonManagedReference;
 
 /**
  * The DTO class for the Company database table.
@@ -30,8 +31,7 @@ public class CompanyDTO implements Serializable {
 
 	private String phone;
 	
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT")
-	private Timestamp timeStamp;
+ 	private Timestamp timeStamp;
 	
 
 	private Set<PersonDTO> persons = new LinkedHashSet<PersonDTO>(0);
@@ -44,7 +44,7 @@ public class CompanyDTO implements Serializable {
 		this.persons = persons;
 	}
 
-	@com.fasterxml.jackson.annotation.JsonManagedReference("projectref")
+	@JsonManagedReference("projectref")
 	private Set<ProjectDTO> projects = new LinkedHashSet<ProjectDTO>(0);
 
 	public Set<ProjectDTO> getProjects() {

@@ -9,10 +9,10 @@ import java.sql.Timestamp;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
- import org.hibernate.validator.constraints.NotEmpty;
+import org.codehaus.jackson.annotate.JsonBackReference;
+import org.codehaus.jackson.annotate.JsonManagedReference;
+import org.hibernate.validator.constraints.NotEmpty;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.yenrof.onsite.dto.PersonDTO;
 
 /**

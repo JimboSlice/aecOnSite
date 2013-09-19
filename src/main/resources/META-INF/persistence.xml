@@ -7,7 +7,6 @@
 	<persistence-unit name="myJPA" transaction-type="JTA">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<jta-data-source>java:jboss/datasources/MysqlDS</jta-data-source>
-		<class>com.yenrof.onsite.model.AppCustom</class>
 		<class>com.yenrof.onsite.model.Area</class>
 		<class>com.yenrof.onsite.model.Asset</class>
 		<class>com.yenrof.onsite.model.Note</class>
@@ -16,12 +15,11 @@
 		<class>com.yenrof.onsite.model.Project</class>
 		<class>com.yenrof.onsite.model.ReferenceData</class>
 		<class>com.yenrof.onsite.model.Report</class>
-		<class>com.yenrof.onsite.model.UserPreference</class>
 		<class>com.yenrof.onsite.model.Person_HAS_Project</class>
 		<properties>
 			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect" />
 		 	<property name="hibernate.hbm2ddl.auto" value="none" />
-			<property name="hibernate.show_sql" value="true" />
+			<property name="hibernate.show_sql" value="false" />
 			<property name="hibernate.format_sql" value="true" />			
 		</properties>
 	</persistence-unit>

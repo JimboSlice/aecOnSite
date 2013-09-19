@@ -2,8 +2,6 @@ package com.yenrof.onsite.dto;
 
 import java.io.Serializable;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -46,7 +44,6 @@ public class Person_HAS_Company implements Serializable {
 
  	private long companyId;
 
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT")
 	private Timestamp timeStamp;
 
 }

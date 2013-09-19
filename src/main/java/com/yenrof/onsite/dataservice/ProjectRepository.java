@@ -56,45 +56,44 @@ public class ProjectRepository {
 		Company company = em.find(Company.class, id);
 		return company;
 	}
-	
+
 	public Person findPersonById(long id) {
 		Person person = em.find(Person.class, id);
 		return person;
 	}
-	
+
 	public Area findAreaById(long id) {
 		Area area = em.find(Area.class, id);
-		return area;		
+		return area;
 	}
-	
+
 	public Report findReportById(long id) {
 		Report report = em.find(Report.class, id);
-		return report;		
+		return report;
 	}
-	
-	
 
-	
 	public Person_HAS_Project findPersonProject(long personId, long projectId) {
-		log.info("findPersonProject - personId:" + personId + "projectId: " + projectId);
+		log.info("findPersonProject - personId:" + personId + "projectId: "
+				+ projectId);
 		String select = "SELECT * FROM Person_HAS_Project where personId=:personId and projectId=:projectId";
 		Query query = em.createNativeQuery(select, Person_HAS_Project.class);
 		query.setParameter("personId", personId);
-		query.setParameter("projectId",	projectId);
+		query.setParameter("projectId", projectId);
 		return (Person_HAS_Project) query.getSingleResult();
 
 	}
 
 	public Person_HAS_Project findPersonProject(
 			AddPersonToProjectRequest addPersonToProjectRequest) {
-		//Person dbPerson = null;
+		// Person dbPerson = null;
 		log.info("findPersonProject:"
 				+ addPersonToProjectRequest.getPerson().getPersonId());
-		//dbPerson = findPersonById(addPersonToProjectRequest.getPerson()
-		//		.getPersonId());
+		// dbPerson = findPersonById(addPersonToProjectRequest.getPerson()
+		// .getPersonId());
 		String select = "SELECT * FROM Person_HAS_Project where personId=:personId and projectId=:projectId";
 		Query query = em.createNativeQuery(select, Person_HAS_Project.class);
-		query.setParameter("personId", addPersonToProjectRequest.getPerson().getPersonId());
+		query.setParameter("personId", addPersonToProjectRequest.getPerson()
+				.getPersonId());
 		query.setParameter("projectId",
 				addPersonToProjectRequest.getProjectId());
 		return (Person_HAS_Project) query.getSingleResult();
@@ -102,8 +101,10 @@ public class ProjectRepository {
 	}
 
 	public Project findByProjectNumber(AddProjectRequest addProjectRequest) {
-		log.info("findByProjectNumber: projectname " + addProjectRequest.getProject().getProjectName());
-		log.info("findByProjectNumber: companyid " + addProjectRequest.getCompanyId());
+		log.info("findByProjectNumber: projectname "
+				+ addProjectRequest.getProject().getProjectName());
+		log.info("findByProjectNumber: companyid "
+				+ addProjectRequest.getCompanyId());
 
 		String number = addProjectRequest.getProject().getProjectNumber();
 		String select = "SELECT * FROM Project  INNER JOIN Company ON Company.companyId = "
@@ -113,10 +114,12 @@ public class ProjectRepository {
 		query.setParameter("companyId", addProjectRequest.getCompanyId());
 		return (Project) query.getSingleResult();
 	}
-	
+
 	public Report findByReportName(AddReportRequest addReportRequest) {
-		log.info("findByReportName: reportname " + addReportRequest.getReport().getRname());
-		log.info("findByReportName: projectId " + addReportRequest.getProjectId());
+		log.info("findByReportName: reportname "
+				+ addReportRequest.getReport().getRname());
+		log.info("findByReportName: projectId "
+				+ addReportRequest.getProjectId());
 
 		String reportName = addReportRequest.getReport().getRname();
 		String select = "SELECT * FROM Report INNER JOIN Project ON Project.projectId = "
@@ -128,7 +131,8 @@ public class ProjectRepository {
 	}
 
 	public Area findByAreaName(AddAreaRequest addAreaRequest) {
-		log.info("findByAreaName: areaname " + addAreaRequest.getArea().getName());
+		log.info("findByAreaName: areaname "
+				+ addAreaRequest.getArea().getName());
 		log.info("findByAreaName: reportId " + addAreaRequest.getReportId());
 
 		String select = "SELECT * FROM Area INNER JOIN Report ON Report.reportId = "
@@ -138,9 +142,10 @@ public class ProjectRepository {
 		query.setParameter("reportId", addAreaRequest.getReportId());
 		return (Area) query.getSingleResult();
 	}
-	
+
 	public Asset findByAssetName(AddAssetRequest addAssetRequest) {
-		log.info("findByAssetName: assetname " + addAssetRequest.getAssetDTO().getName());
+		log.info("findByAssetName: assetname "
+				+ addAssetRequest.getAssetDTO().getName());
 		log.info("findByAssetName: areaid " + addAssetRequest.getAreaId());
 
 		String select = "SELECT * FROM Asset INNER JOIN Area ON Area.areaId = "
@@ -151,9 +156,9 @@ public class ProjectRepository {
 		return (Asset) query.getSingleResult();
 	}
 
-	
 	public Note findByNoteName(AddNoteRequest addNoteRequest) {
-		log.info("findByNoteName: notename " + addNoteRequest.getNoteDTO().getNote());
+		log.info("findByNoteName: notename "
+				+ addNoteRequest.getNoteDTO().getNote());
 		log.info("findByNoteName: areaid " + addNoteRequest.getAreaId());
 
 		String select = "SELECT * FROM Note INNER JOIN Area ON Area.areaId = "
@@ -210,9 +215,9 @@ public class ProjectRepository {
 
 	public List<ProjectDTO> findAllOrderedByName() {
 		String select = "select * from Project order by projectName";
-		List<Project> result= em.createNativeQuery(select).getResultList();
+		List<Project> result = em.createNativeQuery(select).getResultList();
 		List<ProjectDTO> returnList = new ArrayList<ProjectDTO>();
-		Project project=null;
+		Project project = null;
 		if (result != null) {
 			Iterator<Project> projectItr = result.iterator();
 			while (projectItr.hasNext()) {
@@ -245,9 +250,9 @@ public class ProjectRepository {
 		String select = "SELECT * FROM Project INNER JOIN Company ON Company.companyId = Project.Company_companyId where Company.companyId=:companyId";
 		Query query = em.createNativeQuery(select, Project.class);
 		query.setParameter("companyId", companyId);
-		List<Project> result =query.getResultList();
+		List<Project> result = query.getResultList();
 		List<ProjectDTO> returnList = new ArrayList<ProjectDTO>();
-		Project project=null;
+		Project project = null;
 		if (result != null) {
 			Iterator<Project> projectItr = result.iterator();
 			while (projectItr.hasNext()) {
@@ -293,62 +298,71 @@ public class ProjectRepository {
 			php.setProjectId(addPersonToProjectRequest.getProjectId());
 			em.persist(php);
 		} catch (NoResultException e) {
-		    dbPerson = (Person) map(person); // convert to entity
-		    Project dbProject = this.findProjectById(addPersonToProjectRequest.getProjectId());
-		    dbProject.addPerson(dbPerson);
+			dbPerson = (Person) map(person); // convert to entity
+			Project dbProject = this.findProjectById(addPersonToProjectRequest
+					.getProjectId());
+			dbProject.addPerson(dbPerson);
 			em.persist(dbProject);
 		}
 	}
 
-	public long persist(AddProjectRequest addProjectRequest) throws Exception {
+	public ProjectDTO persist(AddProjectRequest addProjectRequest)
+			throws Exception {
 		Company dbCompany = findCompanyById(addProjectRequest.getCompanyId());
-		log.info("Persisting projects for" + dbCompany.getName());
-		log.info("project:" + addProjectRequest.getProject().getProjectName());
-		log.info("companyId:" + dbCompany.getCompanyId());
-		Project dbProject = (Project) map(addProjectRequest.getProject()); // convert to entity
+		log.info("Persisting projects for " + dbCompany.getName());
+		log.info("project: " + addProjectRequest.getProject().getProjectName());
+		log.info("companyId: " + dbCompany.getCompanyId());
+		Project dbProject = (Project) map(addProjectRequest.getProject()); // convert
+																			// to
+																			// entity
 		dbProject.setCompany(dbCompany);
 		em.persist(dbProject);
-		Project dbProject2 = findByProjectNumber(addProjectRequest);
-		return dbProject2.getProjectId();
+		return (ProjectDTO) (map(findByProjectNumber(addProjectRequest)));
 	}
-	
-	public long persist(AddAssetRequest addAssetRequest) throws Exception {
+
+	public AssetDTO persist(AddAssetRequest addAssetRequest) throws Exception {
 		Area dbArea = findAreaById(addAssetRequest.getAreaId());
 		log.info("areaId: " + addAssetRequest.getAreaId());
 		log.info("asset:" + addAssetRequest.getAssetDTO().getName());
-		Asset dbAsset = (Asset) map(addAssetRequest.getAssetDTO()); // convert to entity
+		Asset dbAsset = (Asset) map(addAssetRequest.getAssetDTO()); // convert
+																	// to entity
 		dbAsset.setArea(dbArea);
 		em.persist(dbAsset);
-		Asset dbAsset2 = findByAssetName(addAssetRequest);
-		return dbAsset2.getAssetId();
+		return (AssetDTO) (map(findByAssetName(addAssetRequest)));
 	}
-	
-	public long persist(AddNoteRequest addNoteRequest) throws Exception {
+
+	public NoteDTO persist(AddNoteRequest addNoteRequest) throws Exception {
 		Area dbArea = findAreaById(addNoteRequest.getAreaId());
 		log.info("areaId: " + addNoteRequest.getAreaId());
 		log.info("note:" + addNoteRequest.getNoteDTO().getNote());
-		Note dbNote = (Note) map(addNoteRequest.getNoteDTO()); // convert to entity
+		Note dbNote = (Note) map(addNoteRequest.getNoteDTO()); // convert to
+																// entity
 		dbNote.setArea(dbArea);
 		em.persist(dbNote);
-		Note dbNote2 = findByNoteName(addNoteRequest);
-		return dbNote2.getNoteId();
+		return (NoteDTO) (map(findByNoteName(addNoteRequest)));
 	}
 
-	
-	public long persist(AddReportRequest addReportRequest) throws Exception {
+	public CompanyDTO persist(CompanyDTO company) throws Exception {
+		log.info("Persisting " + company.getName());
+		em.persist((Company) (map(company)));
+		return (CompanyDTO) map(findByCompanyName(company.getName()));
+	}
+
+	public ReportDTO persist(AddReportRequest addReportRequest)
+			throws Exception {
 		Project dbProject = findProjectById(addReportRequest.getProjectId());
 		log.info("projectId: " + addReportRequest.getProjectId());
 		log.info("Persisting report for project " + dbProject.getProjectName());
 		log.info("report:" + addReportRequest.getReport().getRname());
-		Report dbReport = (Report) map(addReportRequest.getReport()); // convert to entity
+		Report dbReport = (Report) map(addReportRequest.getReport()); // convert
+																		// to
+																		// entity
 		dbReport.setProject(dbProject);
 		em.persist(dbReport);
-		Report dbReport2 = findByReportName(addReportRequest);
-		return dbReport2.getReportId();
+		return (ReportDTO) (map(findByReportName(addReportRequest)));
 	}
 
-	
-	public long persist(AddAreaRequest addAreaRequest) throws Exception {
+	public AreaDTO persist(AddAreaRequest addAreaRequest) throws Exception {
 		Report dbReport = findReportById(addAreaRequest.getReportId());
 		log.info("Persisting area for report " + dbReport.getRname());
 		log.info("area:" + addAreaRequest.getArea().getName());
@@ -356,10 +370,8 @@ public class ProjectRepository {
 		Area dbArea = (Area) map(addAreaRequest.getArea()); // convert to entity
 		dbArea.setReport(dbReport);
 		em.persist(dbArea);
-		Area dbArea2 = findByAreaName(addAreaRequest);
-		return dbArea2.getAreaId();
+		return (AreaDTO) (map(findByAreaName(addAreaRequest)));
 	}
-
 
 	// public void persist(Project project) throws Exception {
 	public void persistAll(CompanyDTO company) throws Exception {
@@ -431,33 +443,26 @@ public class ProjectRepository {
 		em.persist(dbCompany);
 	}
 
-	public long persist(CompanyDTO company) throws Exception {
-		log.info("Persisting " + company.getName());
-		em.persist((Company) (map(company)));
-		Company dbCompany = findByCompanyName(company.getName());
-		return dbCompany.getCompanyId();
-
-	}
-
-	public long persist(AddPersonRequest addPersonRequest) throws Exception {
-		PersonDTO person=addPersonRequest.getPerson();
-		log.info("Persisting " + person.getEmail());
+	public PersonDTO persist(AddPersonRequest addPersonRequest)
+			throws Exception {
+		log.info("Persisting " + addPersonRequest.getPerson().getEmail());
 		Company dbCompany = findCompanyById(addPersonRequest.getCompanyId());
 		Person dbPerson = null;
 		try {
-			dbPerson = findByUserName(person.getEmail());
+			dbPerson = findByUserName(addPersonRequest.getPerson().getEmail());
 			// existing user - don't add to Company just add
 			// association
 			Person_HAS_Company phc = new Person_HAS_Company();
 			phc.setPersonId(dbPerson.getPersonId());
 			phc.setCompanyId(dbCompany.getCompanyId());
 			em.persist(phc);
-			return dbPerson.getPersonId();
+			return (PersonDTO) (map(dbPerson));
 		} catch (NoResultException e) {
-			dbCompany.addPerson((Person) map(person)); // JKF
+			dbCompany.addPerson((Person) map(addPersonRequest.getPerson())); // JKF
 			em.persist(dbCompany);
-			dbPerson = findByUserName(person.getEmail());
-			return dbPerson.getPersonId();
+			dbPerson = findByUserName(addPersonRequest.getPerson().getEmail());
+			return (PersonDTO) (map(findByUserName(addPersonRequest.getPerson()
+					.getEmail())));
 		}
 	}
 
@@ -558,5 +563,46 @@ public class ProjectRepository {
 		ProjectDTO projectDTO = boundMapper.map(project);
 		return projectDTO;
 	}
+
+	protected Object map(Report report) {
+		MapperFactory mapperFactory = new DefaultMapperFactory.Builder()
+				.build();
+		BoundMapperFacade<Report, ReportDTO> boundMapper = mapperFactory
+				.getMapperFacade(Report.class, ReportDTO.class);
+		// map the fields of 'source' onto a new instance of PersonDest
+		ReportDTO reportDTO = boundMapper.map(report);
+		return reportDTO;
+	}
+
+	protected Object map(Area area) {
+		MapperFactory mapperFactory = new DefaultMapperFactory.Builder()
+				.build();
+		BoundMapperFacade<Area, AreaDTO> boundMapper = mapperFactory
+				.getMapperFacade(Area.class, AreaDTO.class);
+		// map the fields of 'source' onto a new instance of PersonDest
+		AreaDTO areaDTO = boundMapper.map(area);
+		return areaDTO;
+	}
+
+	protected Object map(Asset asset) {
+		MapperFactory mapperFactory = new DefaultMapperFactory.Builder()
+				.build();
+		BoundMapperFacade<Asset, AssetDTO> boundMapper = mapperFactory
+				.getMapperFacade(Asset.class, AssetDTO.class);
+		// map the fields of 'source' onto a new instance of PersonDest
+		AssetDTO assetDTO = boundMapper.map(asset);
+		return assetDTO;
+	}
+	
+	protected Object map(Note note) {
+		MapperFactory mapperFactory = new DefaultMapperFactory.Builder()
+				.build();
+		BoundMapperFacade<Note,NoteDTO> boundMapper = mapperFactory
+				.getMapperFacade(Note.class, NoteDTO.class);
+		// map the fields of 'source' onto a new instance of PersonDest
+		NoteDTO noteDTO = boundMapper.map(note);
+		return noteDTO;
+	}
+
 
 }

@@ -4,9 +4,6 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
-import java.sql.Timestamp;
 import java.util.Date;
 
 /**
@@ -52,7 +49,6 @@ public class Person_HAS_Project implements Serializable {
 	private long projectId;
 
 	@Column(name = "timeStamp")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT")
-	private Date timeStamp;
+ 	private Date timeStamp;
 
 }

@@ -3,6 +3,8 @@ package com.yenrof.onsite.model;
 import java.io.Serializable;
 
 import javax.persistence.*;
+import org.codehaus.jackson.annotate.JsonBackReference;
+import org.codehaus.jackson.annotate.JsonManagedReference;
 
 
 import java.sql.Timestamp;
@@ -31,7 +33,7 @@ public class Area implements Serializable {
 
 	// bi-directional many-to-one association to Report
 	@ManyToOne
-	@com.fasterxml.jackson.annotation.JsonBackReference
+	@JsonBackReference
 	@JoinColumn(name = "Report_reportId", referencedColumnName = "reportId")
 	private Report report;
 
@@ -40,7 +42,7 @@ public class Area implements Serializable {
 			CascadeType.MERGE }, mappedBy = "area")
 	// @IndexColumn(name="assetId")
 	// @LazyCollection(LazyCollectionOption.FALSE)
-	@com.fasterxml.jackson.annotation.JsonManagedReference
+	@JsonManagedReference
 	private Set<Asset> assets;
 
 	// bi-directional many-to-one association to Note
@@ -48,7 +50,7 @@ public class Area implements Serializable {
 			CascadeType.MERGE }, mappedBy = "area")
 	// @IndexColumn(name="noteId")
 	// @LazyCollection(LazyCollectionOption.FALSE)
-	@com.fasterxml.jackson.annotation.JsonManagedReference
+	@JsonManagedReference
 	private Set<Note> notes;
 
 	public Area() {

@@ -3,8 +3,7 @@ package com.yenrof.onsite.model;
 import java.io.Serializable;
 
 import javax.persistence.*;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import org.codehaus.jackson.annotate.JsonBackReference;
 import java.sql.Timestamp;
 import java.util.Date;
 

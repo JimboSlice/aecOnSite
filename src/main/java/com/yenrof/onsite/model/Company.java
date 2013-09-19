@@ -5,6 +5,7 @@ import java.io.Serializable;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
+import org.codehaus.jackson.annotate.JsonManagedReference;
 import org.hibernate.validator.constraints.NotEmpty;
 
  import com.yenrof.onsite.dto.PersonDTO;
@@ -59,7 +60,7 @@ public class Company implements Serializable {
 	}
 
 	// bi-directional many-to-one association to Project
-	@com.fasterxml.jackson.annotation.JsonManagedReference("projectref")
+	@JsonManagedReference("projectref")
 	@OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST,
 			CascadeType.MERGE }, mappedBy = "company")
 	private Set<Project> projects = new LinkedHashSet<Project>(0);

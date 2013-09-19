@@ -5,8 +5,8 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
+import org.codehaus.jackson.annotate.JsonBackReference;
+import org.codehaus.jackson.annotate.JsonManagedReference;
 
 /**
  * The DTO class for the Project database table.
@@ -43,16 +43,15 @@ public class ProjectDTO implements Serializable {
 
 	private String subAddress;
 	
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT")
-	private Timestamp timeStamp;
+ 	private Timestamp timeStamp;
 	private String uniqueRoomName;
 
 	private String zipcode;
 
-	@com.fasterxml.jackson.annotation.JsonBackReference("projectref")
+	@JsonBackReference("projectref")
 	private CompanyDTO company;
 
-	@com.fasterxml.jackson.annotation.JsonManagedReference("reportref")
+	@JsonManagedReference("reportref")
 	private Set<ReportDTO> reports;
 
 	private Set<PersonDTO> persons = new LinkedHashSet<PersonDTO>(0);
