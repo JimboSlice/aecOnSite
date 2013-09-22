@@ -40,7 +40,7 @@ import com.yenrof.onsite.request.AddReportRequest;
  * This class produces a RESTful service to read/write the contents of the
  * Project table.
  */
-@Path("/onsite")
+@Path("/project")
 @RequestScoped
 @Stateful
 public class ProjectService extends Service {

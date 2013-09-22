@@ -10,7 +10,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+
 import com.yenrof.onsite.dto.OnsiteKeyDTO;
 import com.yenrof.onsite.exception.BadRequestException;
 import com.yenrof.onsite.exception.ConstraintException;
@@ -33,8 +33,8 @@ public class LoginService extends Service {
 	 */
 	@GET
 	@Path("/checkCredentials/{username}-{password}")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(OnsiteMedia.OnsiteMediaType)
+	@Produces(OnsiteMedia.OnsiteMediaType)
 	public OnsiteKeyDTO checkCredentials(
 			@PathParam("username") String username,
 			@PathParam("password") String password) {

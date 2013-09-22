@@ -25,7 +25,7 @@ import javax.ws.rs.core.Application;
 
 import com.yenrof.onsite.exception.BadRequestExceptionMapper;
 import com.yenrof.onsite.exception.ConstraintExceptionMapper;
-import com.yenrof.onsite.exception.EntityCreationException;
+import com.yenrof.onsite.exception.EntityCreationExceptionMapper;
 import com.yenrof.onsite.exception.NotFoundExceptionMapper;
 
 /**
@@ -37,26 +37,28 @@ import com.yenrof.onsite.exception.NotFoundExceptionMapper;
  * {@link ApplicationPath} annotation.
  * </p>
  */
-@ApplicationPath("/rest")
-public class JaxRsActivator extends Application {
+@ApplicationPath("/onsite")
+public class OnsiteApplication extends Application {
 	/* class body intentionally left blank */
-	private static final Logger Log = Logger.getLogger(JaxRsActivator.class
+	private static final Logger Log = Logger.getLogger(OnsiteApplication.class
 			.getName());
 
 	private Set<Object> singletons = new HashSet<Object>();
 	private Set<Class<?>> classes = new HashSet<Class<?>>();
 
 	//tr8769912
-	public JaxRsActivator() {
+	public OnsiteApplication() {
 		Log.info("JaxRsActivator consructor ");
 		singletons.add( new OnsiteDTOWriter());
 		singletons.add(new JacksonConfig());
 		classes.add(ProjectService.class);
 		classes.add(LoginService.class);
+		classes.add(ImageService.class);
+		classes.add(LoginService.class);
 		classes.add(BadRequestExceptionMapper.class);
 		classes.add(ConstraintExceptionMapper.class);
 		classes.add(NotFoundExceptionMapper.class);
-		classes.add(EntityCreationException.class);		
+		classes.add(EntityCreationExceptionMapper.class);		
 	}
 
 	@Override

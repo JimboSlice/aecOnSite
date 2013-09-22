@@ -1,4 +1,8 @@
 <web-app>
 	<display-name>Archetype Created Web Application</display-name>
-
+	<env-entry>
+		<env-entry-name>image-directory</env-entry-name>
+		<env-entry-type>java.lang.String</env-entry-type>
+		<env-entry-value>/images</env-entry-value>
+	</env-entry>	
 </web-app>
